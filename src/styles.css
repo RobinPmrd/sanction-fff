@@ -1,1 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+/*html, body { height: 100%; }*/
+/*body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }*/
+
+input[type=file]::file-selector-button {
+  @apply mr-2 bg-blue-600 text-white px-3 py-2 cursor-pointer rounded-md;
+}
+
+input[type="file"]::file-selector-button:hover {
+  @apply bg-blue-700;
+}
