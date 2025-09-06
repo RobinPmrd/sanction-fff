@@ -136,13 +136,26 @@ describe('AppComponent.sanctionAnalysis', () => {
         dateDuMatch: new Date("2024-09-30"),
         reporteRejoue: "",
         dateReport: ""
+      },
+      {
+        nomAbrege: "REG 1",
+        competition: "Régional 1 Intersport",
+        numeroPhase: 1,
+        numeroDeJournee: 1,
+        numeroDeTour: "",
+        numeroMatch: 2,
+        categorieEquipeLocale: "Libre / Senior",
+        equipeLocale: "TEAM 1",
+        dateDuMatch: new Date("2024-05-18"),
+        reporteRejoue: "",
+        dateReport: ""
       }
     ]);
   })
 
   beforeEach(() => {
     jest.useFakeTimers().setSystemTime(fixedToday);
-    component.suspendedPlayersByCategory = new Map();
+    component.suspendedPlayersByCategory.set(new Map());
   });
 
   it('should be suspended only for team 2', () => {
@@ -164,8 +177,8 @@ describe('AppComponent.sanctionAnalysis', () => {
     component.sanctionAnalysis();
 
     // THEN
-    expect(component.suspendedPlayersByCategory.size).toBe(1);
-    const seniorSuspension = component.suspendedPlayersByCategory.get('Libre / Senior');
+    expect(component.suspendedPlayersByCategory().size).toBe(1);
+    const seniorSuspension = component.suspendedPlayersByCategory().get('Libre / Senior');
     expect(seniorSuspension?.size).toBe(1);
     const johnDoesSuspension = seniorSuspension?.get('John Doe');
     expect(johnDoesSuspension?.length).toBe(1);
@@ -196,8 +209,8 @@ describe('AppComponent.sanctionAnalysis', () => {
     component.sanctionAnalysis();
 
     // THEN
-    expect(component.suspendedPlayersByCategory.size).toBe(1);
-    const seniorSuspension = component.suspendedPlayersByCategory.get('Libre / Senior');
+    expect(component.suspendedPlayersByCategory().size).toBe(1);
+    const seniorSuspension = component.suspendedPlayersByCategory().get('Libre / Senior');
     expect(seniorSuspension?.size).toBe(1);
     const johnDoesSuspension = seniorSuspension?.get('John Doe');
     expect(johnDoesSuspension?.length).toBe(2);
@@ -233,8 +246,8 @@ describe('AppComponent.sanctionAnalysis', () => {
     component.sanctionAnalysis();
 
     // THEN
-    expect(component.suspendedPlayersByCategory.size).toBe(1);
-    const seniorSuspension = component.suspendedPlayersByCategory.get('Libre / Senior');
+    expect(component.suspendedPlayersByCategory().size).toBe(1);
+    const seniorSuspension = component.suspendedPlayersByCategory().get('Libre / Senior');
     expect(seniorSuspension?.size).toBe(1);
     const johnDoesSuspension = seniorSuspension?.get('John Doe');
     expect(johnDoesSuspension?.length).toBe(2);
@@ -269,8 +282,8 @@ describe('AppComponent.sanctionAnalysis', () => {
     component.sanctionAnalysis();
 
     // THEN
-    expect(component.suspendedPlayersByCategory.size).toBe(1);
-    const u19Suspension = component.suspendedPlayersByCategory.get('Libre / U19 - U18');
+    expect(component.suspendedPlayersByCategory().size).toBe(1);
+    const u19Suspension = component.suspendedPlayersByCategory().get('Libre / U19 - U18');
     expect(u19Suspension?.size).toBe(1);
     const mickaelYoungSuspension = u19Suspension?.get('Mickael Young');
     expect(mickaelYoungSuspension?.length).toBe(1);
@@ -301,8 +314,8 @@ describe('AppComponent.sanctionAnalysis', () => {
     component.sanctionAnalysis();
 
     // THEN
-    expect(component.suspendedPlayersByCategory.size).toBe(1);
-    const u19Suspension = component.suspendedPlayersByCategory.get('Libre / U19 - U18');
+    expect(component.suspendedPlayersByCategory().size).toBe(1);
+    const u19Suspension = component.suspendedPlayersByCategory().get('Libre / U19 - U18');
     expect(u19Suspension?.size).toBe(1);
     const mickaelYoungSuspension = u19Suspension?.get('Mickael Young');
     expect(mickaelYoungSuspension?.length).toBe(1);
@@ -333,7 +346,7 @@ describe('AppComponent.sanctionAnalysis', () => {
     component.sanctionAnalysis();
 
     // THEN
-    expect(component.suspendedPlayersByCategory.size).toBe(0);
+    expect(component.suspendedPlayersByCategory().size).toBe(0);
   })
 
   it('should not be suspended when Inscription Au Fichier', () => {
@@ -355,6 +368,51 @@ describe('AppComponent.sanctionAnalysis', () => {
     component.sanctionAnalysis();
 
     // THEN
-    expect(component.suspendedPlayersByCategory.size).toBe(0);
+    expect(component.suspendedPlayersByCategory().size).toBe(0);
+  })
+
+  it('should display not same season error when sanction from past season without match', () => {
+    component.sanctions.set([
+      {
+        competition: 'Régional 1 Intersport',
+        nomPrenomPersonne: 'John Doe',
+        libelleDecision: 'Inscription Au Fichier',
+        dateDeffet: new Date('2023-05-18'),
+        libelleSousCategorie: 'Libre / Senior',
+        numeroPersonne: 1,
+        dateDeFin: new Date('2024-12-18'),
+        nbreCartonsJaunes: 1,
+        cartonRouge: 'Non'
+      }
+    ]);
+
+    // WHEN
+    component.sanctionAnalysis();
+
+    // THEN
+    const analysisErrors = component.errors().get("analysis")
+    expect(analysisErrors?.length).toBe(1);
+    expect(component.suspendedPlayersByCategory().size).toBe(0);
+  })
+
+  it('should display column error when missing required columns on sanctions or matches file', () => {
+    const sanctionsInputColumns = ['Nom, prénom personne', 'Libellé décision', 'Libellé sous catégorie'];
+    const matchesInputColumns = ['Compétition', 'Equipe locale', 'Date du match'];
+
+    // WHEN
+    component.checkColumns(sanctionsInputColumns, 'sanction');
+    component.checkColumns(matchesInputColumns, 'match');
+
+    // THEN
+    const errors = component.errors();
+    expect(errors.size).toBe(2);
+    const sanctionErrors = errors.get('sanction');
+    expect(sanctionErrors?.length).toBe(2);
+    expect(sanctionErrors![0]).toBe('La colonne Compétition est manquante');
+    expect(sanctionErrors![1]).toBe('La colonne Date d\'effet est manquante');
+    const matchErrors = errors.get('match');
+    expect(matchErrors?.length).toBe(1);
+    expect(matchErrors![0]).toBe('La colonne Catégorie équipe locale est manquante');
+    expect(component.suspendedPlayersByCategory().size).toBe(0);
   })
 });
