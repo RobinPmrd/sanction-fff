@@ -110,7 +110,7 @@ export class AppComponent {
       return;
     }
     const today = new Date();
-    const suspendedPlayersByCategory = this.suspendedPlayersByCategory();
+    const suspendedPlayersByCategory = new Map<string, Map<string, TeamSuspension[]>>();
     this.sanctionPerPlayer().forEach((sanction, player) => {
       const lastSanction = sanction[sanction.length - 1];
       const lastNbMatchesSuspension = this.extractSuspensionMatches(lastSanction.libelleDecision);
