@@ -15,6 +15,10 @@ import {parseDate, toCamelCase} from './utils';
 })
 export class AppComponent {
   matches = signal<Match[]>([]);
+  sanctions = signal<Sanction[]>([]);
+  hasProcess = signal(false);
+  errors = signal<Map<string, string[]>>(new Map());
+
   matchesPerTeam = computed(() =>
     Map.groupBy(this.matches().sort((a, b) => a.dateDuMatch.getTime() - b.dateDuMatch.getTime()),
       match => match.equipeLocale + " " + match.categorieEquipeLocale)
@@ -22,10 +26,16 @@ export class AppComponent {
   competitionToCategory = computed(() => {
     return new Map(this.matches().map(match => [match.competition, match.categorieEquipeLocale]))
   });
-  sanctions = signal<Sanction[]>([]);
   sanctionPerPlayer = computed(() => Map.groupBy(this.sanctions(), sanction => sanction.nomPrenomPersonne));
-  suspendedPlayersByCategory = new Map<string, Map<string, TeamSuspension[]>>;
-  disableButton = computed(() => this.sanctions().length === 0 || this.matches().length === 0);
+  suspendedPlayersByCategory = signal(new Map<string, Map<string, TeamSuspension[]>>);
+  disableButton = computed(() => this.sanctions().length === 0 || this.matches().length === 0 || this.hasErrors());
+  displayResult = computed(() => this.hasProcess() && this.suspendedPlayersByCategory().size !== 0);
+  hasErrors = computed(() => Array.from(this.errors().values()).some(value => value.length  !== 0));
+
+  requiredColumns = {
+    sanction: ['Nom, prénom personne', 'Compétition', 'Date d\'effet', 'Libellé décision', 'Libellé sous catégorie'],
+    match: ['Compétition', 'Catégorie équipe locale', 'Equipe locale', 'Date du match']
+  }
 
   onFileChange<T>(event: any, signal: WritableSignal<T[]>) {
     const file = event.target.files[0];
@@ -35,9 +45,12 @@ export class AppComponent {
         const workbook = XLSX.read(e.target.result, { type: 'binary' });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
-        const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, {raw: true});
+        const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, { raw: true});
+        const columns = Object.keys(rawData[0]);
         const data: T[] = rawData.map(row => this.formatData(row));
         signal.set(data);
+        const requiredColumnsKey = signal() === this.sanctions() ? 'sanction' : 'match'
+        this.checkColumns(columns, requiredColumnsKey);
       }
     };
     reader.readAsArrayBuffer(file);
@@ -49,15 +62,30 @@ export class AppComponent {
     );
   }
 
+  checkColumns(columns: string[], requiredColumnsKey: 'sanction' | 'match') {
+    const inputErrors: string[] = [];
+    const requiredColumns = requiredColumnsKey === 'sanction' ? this.requiredColumns.sanction : this.requiredColumns.match;
+    requiredColumns.forEach(requiredColumns => {
+      if (!columns.includes(requiredColumns)) {
+        inputErrors!.push(`La colonne ${requiredColumns} est manquante`);
+      }
+    })
+    this.errors.update(errors => {
+      errors.set(requiredColumnsKey, inputErrors);
+      return new Map(errors);
+    });
+  }
+
   sanctionAnalysis() {
     const today = new Date();
+    const suspendedPlayersByCategory = this.suspendedPlayersByCategory();
     this.sanctionPerPlayer().forEach((sanction, player) => {
       const lastSanction = sanction[sanction.length - 1];
       const lastNbMatchesSuspension = this.extractSuspensionMatches(lastSanction.libelleDecision);
       if (lastNbMatchesSuspension) {
         const suspensionCategory = this.competitionToCategory().get(lastSanction.competition);
         if (suspensionCategory) {
-          const suspendedPlayers = this.suspendedPlayersByCategory.get(suspensionCategory) ?? new Map<string, TeamSuspension[]>;
+          const suspendedPlayers = suspendedPlayersByCategory.get(suspensionCategory) ?? new Map<string, TeamSuspension[]>;
           const playerPotentialTeams = new Map([...this.matchesPerTeam().entries()].filter(([key]) => key.includes(suspensionCategory)));
           playerPotentialTeams.forEach((matches, team) => {
             if (typeof lastNbMatchesSuspension === 'string') {
@@ -81,18 +109,20 @@ export class AppComponent {
             }
           })
           if (suspendedPlayers.size !== 0) {
-            this.suspendedPlayersByCategory.set(suspensionCategory, suspendedPlayers);
+            suspendedPlayersByCategory.set(suspensionCategory, suspendedPlayers);
           }
         }
       }
-    })
+    });
+    this.suspendedPlayersByCategory.set(new Map(suspendedPlayersByCategory));
+    this.hasProcess.set(true);
   }
 
   isMatchCountable(match: Match, sanction: Sanction, today: Date) {
     return match.dateDuMatch >= sanction.dateDeffet && match.dateDuMatch < today && !match.competition.includes("Amicaux");
   }
 
-  extractSuspensionMatches(text: string): number| string | null {
+  extractSuspensionMatches(text: string): number | string | null {
     if (text === 'Suspendu jusqu\'à réception de rapport et décision') {
       return text;
     }
