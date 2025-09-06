@@ -53,7 +53,9 @@ export class AppComponent {
         this.checkColumns(columns, requiredColumnsKey);
       }
     };
-    reader.readAsArrayBuffer(file);
+    if (file) {
+      reader.readAsArrayBuffer(file);
+    }
   }
 
   formatData<T extends Record<string, any>>(obj: T): any {
@@ -64,19 +66,49 @@ export class AppComponent {
 
   checkColumns(columns: string[], requiredColumnsKey: 'sanction' | 'match') {
     const inputErrors: string[] = [];
-    const requiredColumns = requiredColumnsKey === 'sanction' ? this.requiredColumns.sanction : this.requiredColumns.match;
+    const requiredColumns = this.requiredColumns[requiredColumnsKey];
     requiredColumns.forEach(requiredColumns => {
       if (!columns.includes(requiredColumns)) {
         inputErrors!.push(`La colonne ${requiredColumns} est manquante`);
       }
     })
     this.errors.update(errors => {
+      errors.delete("analysis");
       errors.set(requiredColumnsKey, inputErrors);
       return new Map(errors);
     });
   }
 
+  checkSeasonMatching() {
+    const sanctionSeasons = new Set(
+      this.sanctions().map(s => this.getSeason(s.dateDeffet))
+    );
+    const matchSeasons = new Set(
+      this.matches().map(m => this.getSeason(m.dateDuMatch))
+    );
+    for (const season of sanctionSeasons) {
+      if (!matchSeasons.has(season)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  getSeason(date: Date) {
+    const month = date.getMonth();
+    return month >= 1 && month <= 6 ? date.getFullYear() : date.getFullYear() + 1;
+  }
+
   sanctionAnalysis() {
+    this.hasProcess.set(true);
+    if (!this.checkSeasonMatching()) {
+      this.suspendedPlayersByCategory.update(() => new Map());
+      this.errors.update(errors => {
+        errors.set("analysis", ["Le fichier sanctions et rencontres ne datent pas de la même saison"]);
+        return new Map(errors);
+      })
+      return;
+    }
     const today = new Date();
     const suspendedPlayersByCategory = this.suspendedPlayersByCategory();
     this.sanctionPerPlayer().forEach((sanction, player) => {
@@ -115,7 +147,6 @@ export class AppComponent {
       }
     });
     this.suspendedPlayersByCategory.set(new Map(suspendedPlayersByCategory));
-    this.hasProcess.set(true);
   }
 
   isMatchCountable(match: Match, sanction: Sanction, today: Date) {

@@ -8,8 +8,8 @@
     <div class="flex flex-col gap-5">
       <div class="flex flex-col flex-1">
         <label class="flex flex-col font-semibold mb-2" for="sanctionsFileInput">
-          <span>Fichier sanctions Footclubs</span>
-          <span class="font-normal italic">colonnes requises : "Nom, prénom personne", Compétition, Date d'effet, Libellé décision, Libellé sous catégorie</span>
+          <span class="text-lg">Fichier sanctions Footclubs</span>
+          <span class="text-sm font-normal italic">colonnes requises : "Nom, prénom personne", Compétition, Date d'effet, Libellé décision, Libellé sous catégorie</span>
         </label>
         <input
           id="sanctionsFileInput"
@@ -18,7 +18,7 @@
           (change)="onFileChange($event, sanctions)"
           accept=".xlsx, .xls"
         >
-        <div class="flex flex-col text-red-500 italic">
+        <div class="flex flex-col text-red-500 italic p-1">
           @for (error of errors().get('sanction'); track error) {
             <span>{{ error }}</span>
           }
@@ -26,8 +26,8 @@
       </div>
       <div class="flex flex-col flex-1">
         <label class="flex flex-col font-semibold mb-2" for="matchesFileInput">
-          <span>Fichier rencontres Footclubs</span>
-          <span class="font-normal italic">colonnes requises : Compétition, Catégorie équipe locale, Equipe locale, Date du match</span>
+          <span class="text-lg">Fichier rencontres Footclubs</span>
+          <span class="text-sm font-normal italic">colonnes requises : Compétition, Catégorie équipe locale, Equipe locale, Date du match</span>
         </label>
         <input
           id="matchesFileInput"
@@ -36,7 +36,7 @@
           (change)="onFileChange($event, matches)"
           accept=".xlsx, .xls"
         >
-        <div class="flex flex-col text-red-500 italic">
+        <div class="flex flex-col text-red-500 italic p-1">
           @for (error of errors().get('match'); track error) {
             <span>{{ error }}</span>
           }
@@ -99,5 +99,10 @@
   }
   @else if (hasProcess()) {
     <p>Aucun résultat</p>
+    <div class="flex flex-col text-red-500 italic p-1">
+      @for (error of errors().get('analysis'); track error) {
+        <span>{{ error }}</span>
+      }
+    </div>
   }
 </div>
