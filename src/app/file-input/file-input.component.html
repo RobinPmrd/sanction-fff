@@ -1,0 +1,22 @@
+<div class="flex flex-col">
+  <label class="flex flex-col font-semibold mb-2 flex-1" for="sanctionsFileInput">
+    @if (label()) {
+      <span class="text-lg">{{ label() }}</span>
+    }
+    @if (additionalInformations()) {
+      <span class="text-sm font-normal italic">{{ additionalInformations() }}</span>
+    }
+  </label>
+  <input
+    id="sanctionsFileInput"
+    class="border rounded-lg px-3 py-2 text-sm shadow-sm self-start w-sm"
+    type="file"
+    (change)="onFileChange($event)"
+    accept=".xlsx, .xls"
+  >
+  <div class="flex flex-col text-red-500 italic p-1">
+    @for (error of errors(); track error) {
+      <span>{{ error }}</span>
+    }
+  </div>
+</div>

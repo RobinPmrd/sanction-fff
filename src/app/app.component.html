@@ -4,105 +4,38 @@
   </h1>
 </div>
 <div class="p-6 min-h-screen justify-items-center m-auto">
-  <div class="flex gap-15 mb-6 items-center">
+  <div class="flex flex-col gap-5 mb-6 items-center md:flex-row md:gap-15">
     <div class="flex flex-col gap-5">
-      <div class="flex flex-col flex-1">
-        <label class="flex flex-col font-semibold mb-2" for="sanctionsFileInput">
-          <span class="text-lg">Fichier sanctions Footclubs</span>
-          <span class="text-sm font-normal italic">colonnes requises : "Nom, prénom personne", Compétition, Date d'effet, Libellé décision, Libellé sous catégorie</span>
-        </label>
-        <input
-          id="sanctionsFileInput"
-          class="border rounded-lg px-3 py-2 text-sm shadow-sm"
-          type="file"
-          (change)="onFileChange($event, sanctions)"
-          accept=".xlsx, .xls"
-        >
-        <div class="flex flex-col text-red-500 italic p-1">
-          @for (error of errors().get('sanction'); track error) {
-            <span>{{ error }}</span>
-          }
-        </div>
-      </div>
-      <div class="flex flex-col flex-1">
-        <label class="flex flex-col font-semibold mb-2" for="matchesFileInput">
-          <span class="text-lg">Fichier rencontres Footclubs</span>
-          <span class="text-sm font-normal italic">colonnes requises : Compétition, Catégorie équipe locale, Equipe locale, Date du match</span>
-        </label>
-        <input
-          id="matchesFileInput"
-          class="border rounded-lg px-3 py-2 text-sm shadow-sm w-95"
-          type="file"
-          (change)="onFileChange($event, matches)"
-          accept=".xlsx, .xls"
-        >
-        <div class="flex flex-col text-red-500 italic p-1">
-          @for (error of errors().get('match'); track error) {
-            <span>{{ error }}</span>
-          }
-        </div>
-      </div>
+      <file-input
+        label="Fichier sanctions Footclubs"
+        additionalInformations="colonnes requises : 'Nom, prénom personne', Compétition, Date d'effet, Libellé décision, Libellé sous catégorie"
+        [(data)]="sanctions"
+        [requiredColumns]="requiredColumns.sanction"
+        [(hasErrors)]="sanctionsFileHasErrors"
+      >
+      </file-input>
+      <file-input
+        label="Fichier rencontres Footclubs"
+        additionalInformations="colonnes requises : Compétition, Catégorie équipe locale, Equipe locale, Date du match"
+        [(data)]="matches"
+        [requiredColumns]="requiredColumns.match"
+        [(hasErrors)]="matchesFileHasErrors"
+      >
+      </file-input>
     </div>
     <div class="flex items-end">
       <button
         class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-        (click)="sanctionAnalysis()"
+        (click)="onLaunchTreatmentClick()"
         [disabled]="disableButton()"
       >
         Lancer le traitement
       </button>
     </div>
   </div>
-
-  @if (displayResult()) {
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-      @for (cat of suspendedPlayersByCategory() | keyvalue; track cat.key) {
-        @if (cat.value.size !== 0) {
-          <div class="bg-white rounded-xl shadow-md p-4 ">
-            <h2 class="text-lg text-center font-semibold mb-4 text-blue-600 border-b pb-2">
-              Catégorie : {{ cat.key.replace('Libre /', '') }}
-            </h2>
-
-            <div class="overflow-x-auto">
-              <table class="w-full border border-solid border-gray-300 border-collapse border-spacing-0 text-sm rounded-md">
-                <thead class="bg-gray-100 text-left">
-                <tr class="border-b border-b-gray-300">
-                  <th class="p-2 text-gray-800">#</th>
-                  <th class="p-2 text-gray-800">Nom</th>
-                  <th class="p-2 text-gray-800">Équipes</th>
-                </tr>
-                </thead>
-                @for (raw of cat.value | keyvalue; track raw.key) {
-                  <tr class="hover:bg-gray-50" [ngClass]="{'border-b border-gray-300': $index !== cat.value.size - 1}">
-                    <td class="p-2">{{ $index + 1 }}</td>
-                    <td class="p-2 font-medium">{{ raw.key}}</td>
-                    <td class="p-2">
-                      @for (teamSuspension of raw.value; track teamSuspension.name) {
-                        <div class="mb-1">
-                          <span class="text-gray-700">{{ teamSuspension.name }}</span>
-                          <span class="ml-2 text-sm text-gray-500">
-                          <span class="font-semibold text-blue-600">{{ teamSuspension.remaining }}</span>
-                            {{ teamSuspension.remaining > 1 ? 'matchs restants' : 'match restant' }}
-                        </span>
-                          <br>
-                        </div>
-                      }
-                    </td>
-                  </tr>
-                }
-              </table>
-            </div>
-          </div>
-        }
-      }
-    </div>
-  }
-  @else if (hasProcess()) {
-    <p>Aucun résultat</p>
-    <div class="flex flex-col text-red-500 italic p-1">
-      @for (error of errors().get('analysis'); track error) {
-        <span>{{ error }}</span>
-      }
-    </div>
-  }
+  <next-weekend-suspensions
+    [sanctions]="sanctions()"
+    [matches]="matches()"
+    [process]="launchTreatment()"
+  ></next-weekend-suspensions>
 </div>
