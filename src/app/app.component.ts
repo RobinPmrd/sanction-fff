@@ -23,7 +23,7 @@ export class AppComponent {
 
   requiredColumns = {
     sanction: ['Nom, prénom personne', 'Compétition', 'Date d\'effet', 'Libellé décision', 'Libellé sous catégorie'],
-    match: ['Compétition', 'Catégorie équipe locale', 'Equipe locale', 'Date du match']
+    match: ['Compétition', 'Catégorie équipe locale', 'Equipe locale', 'Date du match', 'Date report']
   }
 
   onLaunchTreatmentClick() {

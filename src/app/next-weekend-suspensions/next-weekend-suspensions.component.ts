@@ -68,7 +68,7 @@ export class NextWeekendSuspensionsComponent {
     this.sanctionPerPlayer().forEach((sanction, player) => {
       const lastSanction = sanction[sanction.length - 1];
       const lastNbMatchesSuspension = this.extractSuspensionMatches(lastSanction.libelleDecision);
-      if (lastNbMatchesSuspension) {
+      if (lastNbMatchesSuspension !== 0) {
         const suspensionCategory = this.competitionToCategory().get(lastSanction.competition);
         if (suspensionCategory) {
           const suspendedPlayers = suspendedPlayersByCategory.get(suspensionCategory) ?? new Map<string, TeamSuspension[]>;
@@ -103,14 +103,24 @@ export class NextWeekendSuspensionsComponent {
   }
 
   isMatchCountable(match: Match, sanction: Sanction, today: Date) {
+    if (match.dateReport) {
+      return match.dateReport >= sanction.dateDeffet && match.dateReport < today && !match.competition.includes("Amicaux");
+    }
     return match.dateDuMatch >= sanction.dateDeffet && match.dateDuMatch < today && !match.competition.includes("Amicaux");
   }
 
-  extractSuspensionMatches(text: string): number | string | null {
+  extractSuspensionMatches(text: string): number | string {
     if (text === 'Suspendu jusqu\'à réception de rapport et décision') {
       return text;
     }
     const match = text.match(/(\d+)\s+matchs?\s+de\s+suspension/i);
-    return match ? parseInt(match[1], 10) : null;
+    let count: number = 0;
+    if (match) {
+      count += parseInt(match[1], 10);
+    }
+    if (text.toLowerCase().includes('automatique')) {
+      count++;
+    }
+    return count;
   }
 }

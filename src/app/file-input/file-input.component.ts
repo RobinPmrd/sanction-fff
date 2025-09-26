@@ -23,7 +23,7 @@ export class FileInputComponent<T> {
         const workbook = XLSX.read(e.target.result, {type: 'binary'});
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
-        const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, {raw: true});
+        const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, {raw: true, defval: null});
         const columns = Object.keys(rawData[0]);
         const data: T[] = rawData.map(row => this.formatData(row));
         this.data.set(data);
