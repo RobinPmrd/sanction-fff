@@ -12,6 +12,7 @@ import { Match, Sanction, TeamSuspension } from '../app.model';
 })
 export class NextWeekendSuspensionsComponent {
   sanctions = input.required<Sanction[]>();
+  sanctionPerPlayer = input.required<Map<string, Sanction[]>>();
   matches = input.required<Match[]>();
   process = input(false);
 
@@ -25,7 +26,6 @@ export class NextWeekendSuspensionsComponent {
   competitionToCategory = computed(() => {
     return new Map(this.matches().map(match => [match.competition, match.categorieEquipeLocale]))
   });
-  sanctionPerPlayer = computed(() => Map.groupBy(this.sanctions(), sanction => sanction.nomPrenomPersonne));
   suspendedPlayersByCategory = signal(new Map<string, Map<string, TeamSuspension[]>>);
   displayResult = computed(() => this.hasProcess() && this.suspendedPlayersByCategory().size !== 0);
 
