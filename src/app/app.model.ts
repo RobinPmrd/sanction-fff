@@ -3,7 +3,7 @@ export interface Sanction {
   numeroPersonne: number,
   nomPrenomPersonne: string,
   dateDeffet: Date,
-  dateDeFin: Date | string,
+  dateDeFin: Date | null,
   libelleDecision: string,
   libelleSousCategorie: string,
   nbreCartonsJaunes: number,

@@ -33,9 +33,41 @@
       </button>
     </div>
   </div>
-  <next-weekend-suspensions
-    [sanctions]="sanctions()"
-    [matches]="matches()"
-    [process]="launchTreatment()"
-  ></next-weekend-suspensions>
+  @if (launchTreatment()) {
+    <div class="flex gap-5 pb-5">
+      <button
+        class="bg-blue-400 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+        [ngClass]="{'bg-blue-500': tab() === 0}"
+        (click)="tab.set(0)"
+      >
+        Joueurs suspendus ce week-end
+      </button>
+      <button
+        class="bg-blue-400 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+        [ngClass]="{'bg-blue-500': tab() === 1}"
+        (click)="tab.set(1)"
+      >
+        Carton jaunes actifs
+      </button>
+    </div>
+  }
+  @switch (tab()) {
+    @case (0) {
+      <next-weekend-suspensions
+        [sanctionPerPlayer]="sanctionPerPlayer()"
+        [matches]="matches()"
+        [process]="launchTreatment()"
+      ></next-weekend-suspensions>
+    }
+    @case (1) {
+      <yellow-cards-overview
+        [sanctionPerPlayer]="sanctionPerPlayer()"
+      ></yellow-cards-overview>
+    }
+  }
+  <div class="flex flex-col items-center">
+    @for (error of errors(); track error) {
+      <span class="text-red-500 italic p-1">{{ error }}</span>
+    }
+  </div>
 </div>

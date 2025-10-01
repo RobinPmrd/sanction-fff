@@ -181,8 +181,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
   });
 
   it('should be suspended only for team 2', () => {
-    componentRef.setInput('sanctions', [
-      {
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['John Doe', [{
         competition: 'Régional 1 Intersport',
         nomPrenomPersonne: 'John Doe',
         libelleDecision: '1 match de suspension',
@@ -192,8 +192,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         dateDeFin: "",
         nbreCartonsJaunes: 0,
         cartonRouge: 'Oui'
-      }
-    ]);
+      }]]
+    ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
@@ -213,19 +213,19 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
   });
 
   it('should be suspended for both team when 2 matches suspension ', () => {
-    componentRef.setInput('sanctions', [
-      {
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['John Doe', [{
         competition: 'Régional 1 Intersport',
         nomPrenomPersonne: 'John Doe',
         libelleDecision: '2 matchs de suspension',
         dateDeffet: new Date('2024-09-11'),
         libelleSousCategorie: 'Libre / Senior',
         numeroPersonne: 1,
-        dateDeFin: "",
+        dateDeFin: null,
         nbreCartonsJaunes: 0,
         cartonRouge: 'Oui'
-      }
-    ]);
+      }]]
+    ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
@@ -250,8 +250,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
 
   it('should ignore friendly matches and be suspended for both team first match when suspended from last season', () => {
     jest.useFakeTimers().setSystemTime(new Date('2024-09-06'));
-    componentRef.setInput('sanctions', [
-      {
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['John Doe', [{
         competition: 'Régional 1 Intersport',
         nomPrenomPersonne: 'John Doe',
         libelleDecision: '1 matchs de suspension',
@@ -261,8 +261,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         dateDeFin: "",
         nbreCartonsJaunes: 0,
         cartonRouge: 'Oui'
-      }
-    ]);
+      }]]
+    ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
@@ -286,8 +286,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
   });
 
   it('should be suspended when young player ', () => {
-    componentRef.setInput('sanctions', [
-      {
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['Mickael Young', [{
         competition: 'Départemental 1 U18 Masculin',
         nomPrenomPersonne: 'Mickael Young',
         libelleDecision: '1 Match De Suspension Ferme (3ème avertissement)',
@@ -297,8 +297,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         dateDeFin: "",
         nbreCartonsJaunes: 1,
         cartonRouge: 'Non'
-      }
-    ]);
+      }]]
+    ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
@@ -318,8 +318,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
   });
 
   it('should be suspended when suspended indefinitely ', () => {
-    componentRef.setInput('sanctions', [
-      {
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['Mickael Young', [{
         competition: 'Départemental 1 U18 Masculin',
         nomPrenomPersonne: 'Mickael Young',
         libelleDecision: 'Suspendu jusqu\'à réception de rapport et décision',
@@ -329,8 +329,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         dateDeFin: "",
         nbreCartonsJaunes: 1,
         cartonRouge: 'Non'
-      }
-    ]);
+      }]]
+    ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
@@ -350,8 +350,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
   });
 
   it('should be suspended for one match more when libelleSousCategorie contains Automatique', () => {
-    componentRef.setInput('sanctions', [
-      {
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['Mickael Young', [{
         competition: 'Départemental 1 U18 Masculin',
         nomPrenomPersonne: 'Mickael Young',
         libelleDecision: 'Automatique + 3 Matchs De Suspension',
@@ -361,8 +361,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         dateDeFin: "",
         nbreCartonsJaunes: 1,
         cartonRouge: 'Non'
-      }
-    ]);
+      }]]
+    ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
@@ -383,8 +383,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
 
   it('should be suspended when match report in the future', () => {
     jest.useFakeTimers().setSystemTime(new Date('2024-09-30'));
-    componentRef.setInput('sanctions', [
-      {
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['John Doe', [{
         competition: 'Régional 1 Intersport',
         nomPrenomPersonne: 'John Doe',
         libelleDecision: '1 matchs de suspension',
@@ -394,8 +394,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         dateDeFin: "",
         nbreCartonsJaunes: 0,
         cartonRouge: 'Oui'
-      }
-    ]);
+      }]]
+    ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
@@ -419,8 +419,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
   });
 
   it('should not be suspended', () => {
-    componentRef.setInput('sanctions', [
-      {
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['John Doe', [{
         competition: 'Régional 1 Intersport',
         nomPrenomPersonne: 'John Doe',
         libelleDecision: '1 match de suspension',
@@ -430,8 +430,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         dateDeFin: "",
         nbreCartonsJaunes: 0,
         cartonRouge: 'Oui'
-      }
-    ]);
+      }]]
+    ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
@@ -441,8 +441,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
   })
 
   it('should not be suspended when Inscription Au Fichier', () => {
-    componentRef.setInput('sanctions', [
-      {
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['John Doe', [{
         competition: 'Régional 1 Intersport',
         nomPrenomPersonne: 'John Doe',
         libelleDecision: 'Inscription Au Fichier',
@@ -452,8 +452,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         dateDeFin: new Date('2024-12-18'),
         nbreCartonsJaunes: 1,
         cartonRouge: 'Non'
-      }
-    ]);
+      }]]
+    ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
@@ -464,8 +464,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
 
   it('should not be suspended with Team 2 when match report in advance', () => {
     jest.useFakeTimers().setSystemTime(new Date('2024-10-14'));
-    componentRef.setInput('sanctions', [
-      {
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['John Doe', [{
         competition: 'Régional 1 Intersport',
         nomPrenomPersonne: 'John Doe',
         libelleDecision: '1 matchs de suspension',
@@ -475,8 +475,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         dateDeFin: "",
         nbreCartonsJaunes: 0,
         cartonRouge: 'Oui'
-      }
-    ]);
+      }]]
+    ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
@@ -494,28 +494,4 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       }
     ]);
   });
-
-  it('should display not same season error when sanction from past season without match', () => {
-    componentRef.setInput('sanctions', [
-      {
-        competition: 'Régional 1 Intersport',
-        nomPrenomPersonne: 'John Doe',
-        libelleDecision: 'Inscription Au Fichier',
-        dateDeffet: new Date('2023-05-18'),
-        libelleSousCategorie: 'Libre / Senior',
-        numeroPersonne: 1,
-        dateDeFin: new Date('2024-12-18'),
-        nbreCartonsJaunes: 1,
-        cartonRouge: 'Non'
-      }
-    ]);
-
-    // WHEN
-    nextWeekendSuspensionsComponent.sanctionAnalysis();
-
-    // THEN
-    const analysisErrors = nextWeekendSuspensionsComponent.errors();
-    expect(analysisErrors?.length).toBe(1);
-    expect(nextWeekendSuspensionsComponent.suspendedPlayersByCategory().size).toBe(0);
-  })
 });
