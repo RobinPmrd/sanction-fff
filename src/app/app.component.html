@@ -54,7 +54,6 @@
   @switch (tab()) {
     @case (0) {
       <next-weekend-suspensions
-        [sanctions]="sanctions()"
         [sanctionPerPlayer]="sanctionPerPlayer()"
         [matches]="matches()"
         [process]="launchTreatment()"
@@ -66,4 +65,12 @@
       ></yellow-cards-overview>
     }
   }
+  @if (launchTreatment()) {
+
+  }
+  <div class="flex flex-col items-center">
+    @for (error of errors(); track error) {
+      <span class="text-red-500 italic p-1">{{ error }}</span>
+    }
+  </div>
 </div>

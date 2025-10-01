@@ -8,13 +8,13 @@
     <th class="p-2 text-gray-800">Date de remise à 0</th>
   </tr>
   </thead>
-  @for (raw of yellowCardsByPlayer() | keyvalue; track raw.key) {
+  @for (raw of yellowCardsData(); track raw.player) {
     <tr class="hover:bg-gray-50">
       <td class="p-2">{{ $index + 1 }}</td>
-      <td class="p-2 text-left font-medium">{{ raw.key}}</td>
-      <td class="p-2 text-left">{{ raw.value.subcategory }}</td>
-      <td class="p-2">{{ raw.value.number }}</td>
-      <td class="p-2">{{ raw.value.endDate | date:'dd/MM/yyyy'}}</td>
+      <td class="p-2 text-left font-medium">{{ raw.player}}</td>
+      <td class="p-2 text-left">{{ raw.subcategory }}</td>
+      <td class="p-2">{{ raw.number }}</td>
+      <td class="p-2">{{ raw.endDate | date:'dd/MM/yyyy'}}</td>
     </tr>
   }
 </table>

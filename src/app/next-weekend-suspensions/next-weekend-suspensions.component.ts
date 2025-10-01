@@ -11,13 +11,11 @@ import { Match, Sanction, TeamSuspension } from '../app.model';
   templateUrl: './next-weekend-suspensions.component.html',
 })
 export class NextWeekendSuspensionsComponent {
-  sanctions = input.required<Sanction[]>();
   sanctionPerPlayer = input.required<Map<string, Sanction[]>>();
   matches = input.required<Match[]>();
   process = input(false);
 
   hasProcess = signal(false);
-  errors = signal<string[]>([]);
 
   matchesPerTeam = computed(() =>
     Map.groupBy(this.matches().sort((a, b) => a.dateDuMatch.getTime() - b.dateDuMatch.getTime()),
@@ -33,36 +31,14 @@ export class NextWeekendSuspensionsComponent {
     effect(() => {
       if (this.process()) {
         this.sanctionAnalysis();
+      } else {
+        this.suspendedPlayersByCategory.update(() => new Map());
       }
     });
   }
 
-  checkSeasonMatching() {
-    const sanctionSeasons = new Set(
-      this.sanctions().map(s => this.getSeason(s.dateDeffet))
-    );
-    const matchSeasons = new Set(
-      this.matches().map(m => this.getSeason(m.dateDuMatch))
-    );
-    for (const season of sanctionSeasons) {
-      if (!matchSeasons.has(season)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  getSeason(date: Date) {
-    const month = date.getMonth();
-    return month >= 1 && month <= 6 ? date.getFullYear() : date.getFullYear() + 1;
-  }
-
   sanctionAnalysis() {
     this.hasProcess.set(true);
-    if (!this.checkSeasonMatching()) {
-      this.suspendedPlayersByCategory.update(() => new Map());
-      this.errors.set(["Le fichier sanctions et rencontres ne datent pas de la même saison"]);
-    }
     const today = new Date();
     const suspendedPlayersByCategory = new Map<string, Map<string, TeamSuspension[]>>();
     this.sanctionPerPlayer().forEach((sanction, player) => {
