@@ -34,7 +34,7 @@ export class YellowCardsOverviewComponent {
         yellowCardsData.push(yellowCardData);
       }
     })
-    yellowCardsData.sort((a,b) => this.sortByYellowCardAndEndDate(a, b));
+    yellowCardsData.sort((a, b) => this.sortByYellowCardAndEndDate(a, b));
     return yellowCardsData;
   });
 
@@ -52,10 +52,10 @@ export class YellowCardsOverviewComponent {
   }
 
 
-    sortByYellowCardAndEndDate(a: YellowCardData, b: YellowCardData) {
-      if (a.number === b.number) {
-        return b.endDate > a.endDate ? -1 : 1;
-      }
-      return a.number > b.number ? -1 : 1;
+  sortByYellowCardAndEndDate(a: YellowCardData, b: YellowCardData) {
+    if (a.number === b.number) {
+      return b.endDate > a.endDate ? -1 : 1;
     }
+    return a.number > b.number ? -1 : 1;
+  }
 }
