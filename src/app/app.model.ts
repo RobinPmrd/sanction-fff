@@ -6,8 +6,9 @@ export interface Sanction {
   dateDeFin: Date | null,
   libelleDecision: string,
   libelleSousCategorie: string,
-  nbreCartonsJaunes: number,
+  nbreCartonsJaunes: number | null,
   cartonRouge: 'Oui' | 'Non'
+  sommeTotale: number | null,
 }
 
 export interface Match {

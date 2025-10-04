@@ -49,6 +49,13 @@
       >
         Carton jaunes actifs
       </button>
+      <button
+        class="bg-blue-400 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+        [ngClass]="{'bg-blue-500': tab() === 2}"
+        (click)="tab.set(2)"
+      >
+        Palmarès des cartons
+      </button>
     </div>
   }
   @switch (tab()) {
@@ -63,6 +70,11 @@
       <yellow-cards-overview
         [sanctionPerPlayer]="sanctionPerPlayer()"
       ></yellow-cards-overview>
+    }
+    @case (2) {
+      <season-cards-overview
+        [sanctionPerPlayer]="sanctionPerPlayer()"
+      ></season-cards-overview>
     }
   }
   <div class="flex flex-col items-center">

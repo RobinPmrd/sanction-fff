@@ -4,6 +4,7 @@ import { FileInputComponent } from './file-input/file-input.component';
 import { NextWeekendSuspensionsComponent } from './next-weekend-suspensions/next-weekend-suspensions.component';
 import { YellowCardsOverviewComponent } from './yellow-cards-overview/yellow-cards-overview.component';
 import { NgClass } from '@angular/common';
+import { SeasonCardsOverviewComponent } from './season-cards-overview/season-cards-overview.component';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,8 @@ import { NgClass } from '@angular/common';
     FileInputComponent,
     NextWeekendSuspensionsComponent,
     YellowCardsOverviewComponent,
-    NgClass
+    NgClass,
+    SeasonCardsOverviewComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

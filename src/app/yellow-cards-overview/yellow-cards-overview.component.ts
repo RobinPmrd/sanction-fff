@@ -21,8 +21,8 @@ export class YellowCardsOverviewComponent {
   yellowCardsData = computed(() => {
     const yellowCardsData: YellowCardData[] = [];
     const today = new Date();
-    this.sanctionPerPlayer().forEach((sanction, player) => {
-      const lastSanction = sanction[sanction.length - 1];
+    this.sanctionPerPlayer().forEach((sanctions, player) => {
+      const lastSanction = sanctions[sanctions.length - 1];
       const yellowCards = this.extractYellowCardsInPeriod(lastSanction, today);
       if (yellowCards) {
         const yellowCardData: YellowCardData = {

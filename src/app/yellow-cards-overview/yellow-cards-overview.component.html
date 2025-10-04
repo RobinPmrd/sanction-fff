@@ -1,20 +1,22 @@
-<table class="border border-solid border-gray-300 border-collapse border-spacing-0 text-sm rounded-md text-center m-auto">
-  <thead class="bg-gray-100">
-  <tr class="border-b border-b-gray-300">
-    <th class="p-2 text-gray-800">#</th>
-    <th class="p-2 text-left text-gray-800">Nom</th>
-    <th class="p-2 text-left text-gray-800">Sous-catégorie</th>
-    <th class="p-2 text-gray-800">Carton jaunes</th>
-    <th class="p-2 text-gray-800">Date de remise à 0</th>
-  </tr>
-  </thead>
-  @for (raw of yellowCardsData(); track raw.player) {
-    <tr class="hover:bg-gray-50">
-      <td class="p-2">{{ $index + 1 }}</td>
-      <td class="p-2 text-left font-medium">{{ raw.player}}</td>
-      <td class="p-2 text-left">{{ raw.subcategory }}</td>
-      <td class="p-2">{{ raw.number }}</td>
-      <td class="p-2">{{ raw.endDate | date:'dd/MM/yyyy'}}</td>
+<div class="max-h-[80vh] overflow-y-auto w-fit m-auto">
+  <table class="border border-solid border-gray-300 border-collapse border-spacing-0 text-sm rounded-md text-center m-auto">
+    <thead class="bg-gray-100 sticky top-0">
+    <tr class="border-b border-b-gray-300">
+      <th class="p-2 text-gray-800">#</th>
+      <th class="p-2 text-left text-gray-800">Nom</th>
+      <th class="p-2 text-left text-gray-800">Sous-catégorie</th>
+      <th class="p-2 text-gray-800">Carton jaunes</th>
+      <th class="p-2 text-gray-800">Date de remise à 0</th>
     </tr>
-  }
-</table>
+    </thead>
+    @for (raw of yellowCardsData(); track raw.player) {
+      <tr class="hover:bg-gray-50">
+        <td class="p-2">{{ $index + 1 }}</td>
+        <td class="p-2 text-left font-medium">{{ raw.player }}</td>
+        <td class="p-2 text-left">{{ raw.subcategory }}</td>
+        <td class="p-2">{{ raw.number }}</td>
+        <td class="p-2">{{ raw.endDate | date:'dd/MM/yyyy' }}</td>
+      </tr>
+    }
+  </table>
+</div>
