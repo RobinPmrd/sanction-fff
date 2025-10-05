@@ -1,47 +1,64 @@
 <div class="max-h-[80vh] overflow-y-auto w-fit m-auto">
   <table class="border border-solid border-gray-300 border-collapse border-spacing-0 text-sm rounded-md text-center m-auto">
     <thead class="bg-gray-100 sticky top-0">
-    <tr class="border-b border-b-gray-300">
-      <th class="p-2 text-gray-800">#</th> @for (columnLabel of columnLabels; track columnLabel) {
-      <th class="p-2 text-left text-gray-800">
-        <div class="flex items-center gap-1 w-fit hover:cursor-pointer hover:text-blue-600" (click)="onSortColumn(columnLabel.key)"><span>{{ columnLabel.label }}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="size-4 text-blue-600"> @if (sortColumn() === columnLabel.key) {
-            @if (sortDirection() === 'desc') {
-              <path fill-rule="evenodd"
-                    d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z"
-                    clip-rule="evenodd" fill="currentColor"/>
-            } @else {
-              <path fill-rule="evenodd"
-                    d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z"
-                    clip-rule="evenodd" fill="currentColor"/>
+      <tr class="border-b border-b-gray-300">
+        <th class="p-2 text-gray-800">#</th> 
+        @for (columnLabel of columnLabels; track columnLabel) {
+          <th class="p-2 text-gray-800">
+            <div class="flex items-center gap-1 w-fit hover:cursor-pointer hover:text-blue-600" (click)="onSortColumn(columnLabel.key)"><span>{{ columnLabel.label }}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="size-4 text-blue-600"> @if (sortColumn() === columnLabel.key) {
+                @if (sortDirection() === 'desc') {
+                  <path fill-rule="evenodd"
+                        d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z"
+                        clip-rule="evenodd" fill="currentColor"/>
+                } @else {
+                  <path fill-rule="evenodd"
+                        d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z"
+                        clip-rule="evenodd" fill="currentColor"/>
+                }
+              } </svg>
+            </div>
+          </th>
+        } 
+      </tr>
+    </thead> 
+    @for (raw of cardsHistoric(); track raw.player) {
+      <tr class="hover:bg-blue-50 transition-colors duration-150 even:bg-gray-50">
+        <td class="p-2">
+          @switch ($index) {
+            @case (0) {
+              {{ '🥇' }}
             }
-          } </svg>
-        </div>
-      </th>
-    } </tr>
-    </thead> @for (raw of cardsHistoric(); track raw.player) {
-    <tr class="hover:bg-gray-50">
-      <td class="p-2">
-        @switch ($index) {
-          @case (0) {
-            {{ '🥇' }}
+            @case (1) {
+              {{ '🥈' }}
+            }
+            @case (2) {
+              {{ '🥉' }}
+            }
+            @default {
+              {{ $index + 1 }}
+            }
           }
-          @case (1) {
-            {{ '🥈' }}
-          }
-          @case (2) {
-            {{ '🥉' }}
-          }
-          @default {
-            {{ $index + 1 }}
-          }
-        }
-      </td>
-      <td class="p-2 text-left font-medium">{{ raw.player }}</td>
-      <td class="p-2 text-left">{{ raw.subcategory }}</td>
-      <td class="p-2">{{ raw.yellowCards }}</td>
-      <td class="p-2">{{ raw.redCards }}</td>
-      <td class="p-2">{{ raw.totalCost + '€' }}</td>
-    </tr>
-  } </table>
+        </td>
+        <td class="p-2 text-left font-medium w-[10vw]">{{ raw.player }}</td>
+        <td class="p-2 text-left">{{ raw.subcategory }}</td>
+        <td class="p-2">{{ raw.yellowCards }}</td>
+        <td class="p-2">{{ raw.redCards }}</td>
+        <td class="p-2">{{ raw.whiteCards }}</td>
+        <td class="p-2">{{ raw.totalCards }}</td>
+        <td class="p-2 text-left">
+          <div class="p-2 flex flex-col gap-1 w-[20vw]">
+            @for (reason of raw.reasons; track $index) {
+              @if (reason.number > 1) {
+                <span>{{ reason.label + ' (x' + reason.number + ')' }}</span>
+              } @else {
+                <span>{{ reason.label }}</span>
+              }
+            }
+          </div>
+        </td>
+        <td class="p-2">{{ raw.totalCost + '€' }}</td>
+      </tr>
+    } 
+  </table>
 </div>

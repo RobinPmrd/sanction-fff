@@ -6,7 +6,15 @@ interface CardHistoric {
   subcategory: string
   yellowCards: number,
   redCards: number,
+  whiteCards: number,
+  totalCards: number,
+  reasons: Reason[];
   totalCost: number
+}
+
+interface Reason {
+  label: string,
+  number: number
 }
 
 interface ColumnMappingLabelKey {
@@ -31,23 +39,33 @@ export class SeasonCardsOverviewComponent {
         subcategory: sanctions[0].libelleSousCategorie,
         yellowCards: 0,
         redCards: 0,
+        whiteCards: 0,
+        totalCards: 0,
+        reasons: [],
         totalCost: 0,
       };
       sanctions.forEach(sanction => {
         cardHistoric.yellowCards += sanction.nbreCartonsJaunes ?? 0;
         cardHistoric.redCards += sanction.cartonRouge === 'Oui' ? 1 : 0;
+        cardHistoric.whiteCards += sanction.libelleDecision === 'Exclusion temporaire' ? 1 : 0;
+        if (sanction.libelleMotif) {
+          const reason = cardHistoric.reasons.find(reason => reason.label === sanction.libelleMotif);
+          if (reason) {
+            reason.number++;
+          } else {
+            cardHistoric.reasons.push({label: sanction.libelleMotif, number: 1});
+          }
+        }
         cardHistoric.totalCost += sanction.sommeTotale ?? 0;
-      })
+      });
+      cardHistoric.totalCards = cardHistoric.yellowCards + cardHistoric.redCards + cardHistoric.whiteCards;
       cardsHistoric.push(cardHistoric);
     })
     cardsHistoric.sort((a, b) => this.sortRaw(a, b));
     return cardsHistoric;
   });
-  columnLabels: ColumnMappingLabelKey[] = [{label: 'Nom', key: 'player'}, {label: 'Sous-catégorie', key: 'subcategory'}, {
-    label: 'Carton jaunes',
-    key: 'yellowCards'
-  }, {label: 'Carton rouges', key: 'redCards'}, {label: 'Amende totale', key: 'totalCost'}]
-  initialSorting: CardHistoricKey[] = ['totalCost', 'redCards', 'yellowCards', 'player', 'subcategory'];
+  columnLabels: ColumnMappingLabelKey[] = [{label: 'Nom', key: 'player'}, {label: 'Sous-catégorie', key: 'subcategory'}, {label: 'Carton jaunes',key: 'yellowCards'}, {label: 'Carton rouges', key: 'redCards'}, {label: 'Carton blancs', key: 'whiteCards'}, {label: 'Total cartons', key: 'totalCards'}, {label: 'Motifs', key: 'reasons'}, {label: 'Amende totale', key: 'totalCost'}]
+  initialSorting: CardHistoricKey[] = ['totalCost','totalCards', 'redCards', 'yellowCards', 'whiteCards', 'player', 'subcategory'];
   currentSorting = signal(this.initialSorting);
   sortDirection = signal<'asc' | 'desc'>('desc');
   sortColumn = signal<CardHistoricKey>('totalCost');

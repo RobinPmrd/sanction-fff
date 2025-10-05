@@ -1,6 +1,6 @@
 import { Component, input, model, signal } from '@angular/core';
 import * as XLSX from 'xlsx';
-import { parseDate, toCamelCase } from '../utils';
+import { parseValue, toCamelCase } from '../utils';
 
 @Component({
   selector: 'file-input',
@@ -37,7 +37,7 @@ export class FileInputComponent<T> {
 
   formatData<T extends Record<string, any>>(obj: T): any {
     return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => [toCamelCase(key), parseDate(value)])
+      Object.entries(obj).map(([key, value]) => [toCamelCase(key), parseValue(value)])
     );
   }
 
