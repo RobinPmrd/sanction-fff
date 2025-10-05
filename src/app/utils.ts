@@ -17,5 +17,5 @@ export function toCamelCase(str: string): string {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[\s_-]+(.)?/g, (_, chr) => chr ? chr.toUpperCase() : "")
-    .replace(/[^\w]/g, ""); // remove accents/punctuation if needed
+    .replace(/[^\w]/g, "");
 }
