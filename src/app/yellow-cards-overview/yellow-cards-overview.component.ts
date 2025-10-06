@@ -5,7 +5,7 @@ import { DatePipe } from '@angular/common';
 interface YellowCardData {
   player: string,
   number: number,
-  endDate: Date,
+  endDates: Date[],
   subcategory: string
 }
 
@@ -22,15 +22,8 @@ export class YellowCardsOverviewComponent {
     const yellowCardsData: YellowCardData[] = [];
     const today = new Date();
     this.sanctionPerPlayer().forEach((sanctions, player) => {
-      const lastSanction = sanctions[sanctions.length - 1];
-      const yellowCards = this.extractYellowCardsInPeriod(lastSanction, today);
-      if (yellowCards) {
-        const yellowCardData: YellowCardData = {
-          player: player,
-          number: yellowCards,
-          endDate: lastSanction.dateDeFin!,
-          subcategory: lastSanction.libelleSousCategorie
-        }
+      const yellowCardData = this.buildYellowCardData(sanctions, player, today);
+      if (yellowCardData.number > 0) {
         yellowCardsData.push(yellowCardData);
       }
     })
@@ -38,23 +31,34 @@ export class YellowCardsOverviewComponent {
     return yellowCardsData;
   });
 
-  extractYellowCardsInPeriod(sanction: Sanction, today: Date): number | null {
-    if (sanction.dateDeFin && sanction.dateDeFin < today) {
-      return null;
+  buildYellowCardData(sanctions: Sanction[], player: string, today: Date): YellowCardData {
+    const yellowCardData: YellowCardData = {
+      player: player,
+      subcategory: sanctions[0].libelleSousCategorie,
+      endDates: [],
+      number: 0,
     }
-    const libelleDecision = sanction.libelleDecision.toLowerCase();
-    if (libelleDecision === ('inscription au fichier')) {
-      return 1;
-    } else if (libelleDecision.includes('inscription au fichier')) {
-      return 2
+    sanctions.forEach(sanction => {
+      const yellowCards = this.isYellowCardInPeriod(sanction, today);
+      if (yellowCards) {
+        yellowCardData.endDates.push(sanction.dateDeFin!);
+        yellowCardData.number++;
+      }
+    });
+    return yellowCardData;
+  }
+
+  isYellowCardInPeriod(sanction: Sanction, today: Date): boolean {
+    if (!sanction.dateDeFin || sanction.dateDeFin < today) {
+      return false;
     }
-    return null;
+    return sanction.nbreCartonsJaunes === 1;
   }
 
 
   sortByYellowCardAndEndDate(a: YellowCardData, b: YellowCardData) {
     if (a.number === b.number) {
-      return b.endDate > a.endDate ? -1 : 1;
+      return b.endDates[0] > a.endDates[0] ? -1 : 1;
     }
     return a.number > b.number ? -1 : 1;
   }

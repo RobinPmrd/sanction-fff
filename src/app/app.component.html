@@ -1,85 +1,87 @@
-<div class="w-full bg-blue-600">
-  <h1 class="text-4xl font-bold text-gray-50 p-3 text-center rounded-md">
-    Gestion des Sanctions
-  </h1>
-</div>
-<div class="p-6 min-h-screen justify-items-center m-auto">
-  <div class="flex flex-col gap-5 mb-6 items-center md:flex-row md:gap-15">
-    <div class="flex flex-col gap-5">
-      <file-input
-        label="Fichier sanctions Footclubs"
-        additionalInformations="colonnes requises : 'Nom, prénom personne', Compétition, Date d'effet, Libellé décision, Libellé sous catégorie"
-        [(data)]="sanctions"
-        [requiredColumns]="requiredColumns.sanction"
-        [(hasErrors)]="sanctionsFileHasErrors"
-      >
-      </file-input>
-      <file-input
-        label="Fichier rencontres Footclubs"
-        additionalInformations="colonnes requises : Compétition, Catégorie équipe locale, Equipe locale, Date du match, Date report"
-        [(data)]="matches"
-        [requiredColumns]="requiredColumns.match"
-        [(hasErrors)]="matchesFileHasErrors"
-      >
-      </file-input>
-    </div>
-    <div class="flex items-end">
-      <button
-        class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-        (click)="onLaunchTreatmentClick()"
-        [disabled]="disableButton()"
-      >
-        Lancer le traitement
-      </button>
-    </div>
+<div class="max-v-[100vw]">
+  <div class="w-full bg-blue-600">
+    <h1 class="text-4xl font-bold text-gray-50 p-3 text-center rounded-md">
+      Gestion des Sanctions
+    </h1>
   </div>
-  @if (launchTreatment()) {
-    <div class="flex gap-5 pb-5">
-      <button
-        class="bg-blue-400 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-        [ngClass]="{'bg-blue-500': tab() === 0}"
-        (click)="tab.set(0)"
-      >
-        Joueurs suspendus ce week-end
-      </button>
-      <button
-        class="bg-blue-400 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-        [ngClass]="{'bg-blue-500': tab() === 1}"
-        (click)="tab.set(1)"
-      >
-        Carton jaunes actifs
-      </button>
-      <button
-        class="bg-blue-400 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-        [ngClass]="{'bg-blue-500': tab() === 2}"
-        (click)="tab.set(2)"
-      >
-        Palmarès des cartons
-      </button>
+  <div class="p-6 min-h-screen justify-items-center m-auto">
+    <div class="flex flex-col gap-5 mb-6 items-center sm:flex-row sm:gap-15">
+      <div class="flex flex-col gap-5">
+        <file-input
+          label="Fichier sanctions Footclubs"
+          additionalInformations="colonnes requises : 'Nom, prénom personne', Compétition, Date d'effet, Libellé décision, Libellé sous catégorie"
+          [(data)]="sanctions"
+          [requiredColumns]="requiredColumns.sanction"
+          [(hasErrors)]="sanctionsFileHasErrors"
+        >
+        </file-input>
+        <file-input
+          label="Fichier rencontres Footclubs"
+          additionalInformations="colonnes requises : Compétition, Catégorie équipe locale, Equipe locale, Date du match, Date report"
+          [(data)]="matches"
+          [requiredColumns]="requiredColumns.match"
+          [(hasErrors)]="matchesFileHasErrors"
+        >
+        </file-input>
+      </div>
+      <div class="flex items-end">
+        <button
+          class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+          (click)="onLaunchTreatmentClick()"
+          [disabled]="disableButton()"
+        >
+          Lancer le traitement
+        </button>
+      </div>
     </div>
-  }
-  @switch (tab()) {
-    @case (0) {
-      <next-weekend-suspensions
-        [sanctionPerPlayer]="sanctionPerPlayer()"
-        [matches]="matches()"
-        [process]="launchTreatment()"
-      ></next-weekend-suspensions>
+    @if (launchTreatment()) {
+      <div class="flex gap-5 pb-5">
+        <button
+          class="bg-blue-400 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+          [ngClass]="{'bg-blue-500': tab() === 0}"
+          (click)="tab.set(0)"
+        >
+          Joueurs suspendus ce week-end
+        </button>
+        <button
+          class="bg-blue-400 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+          [ngClass]="{'bg-blue-500': tab() === 1}"
+          (click)="tab.set(1)"
+        >
+          Carton jaunes actifs
+        </button>
+        <button
+          class="bg-blue-400 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+          [ngClass]="{'bg-blue-500': tab() === 2}"
+          (click)="tab.set(2)"
+        >
+          Palmarès des cartons
+        </button>
+      </div>
     }
-    @case (1) {
-      <yellow-cards-overview
-        [sanctionPerPlayer]="sanctionPerPlayer()"
-      ></yellow-cards-overview>
+    @switch (tab()) {
+      @case (0) {
+        <next-weekend-suspensions
+          [sanctionPerPlayer]="sanctionPerPlayer()"
+          [matches]="matches()"
+          [process]="launchTreatment()"
+        ></next-weekend-suspensions>
+      }
+      @case (1) {
+        <yellow-cards-overview
+          [sanctionPerPlayer]="sanctionPerPlayer()"
+        ></yellow-cards-overview>
+      }
+      @case (2) {
+        <season-cards-overview
+          [sanctionPerPlayer]="sanctionPerPlayer()"
+        ></season-cards-overview>
+      }
     }
-    @case (2) {
-      <season-cards-overview
-        [sanctionPerPlayer]="sanctionPerPlayer()"
-      ></season-cards-overview>
-    }
-  }
-  <div class="flex flex-col items-center">
-    @for (error of errors(); track error) {
-      <span class="text-red-500 italic p-1">{{ error }}</span>
-    }
+    <div class="flex flex-col items-center">
+      @for (error of errors(); track error) {
+        <span class="text-red-500 italic p-1">{{ error }}</span>
+      }
+    </div>
   </div>
 </div>
