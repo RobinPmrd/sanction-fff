@@ -1,5 +1,5 @@
 @if (displayResult()) {
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
     @for (cat of suspendedPlayersByCategory() | keyvalue; track cat.key) {
       @if (cat.value.size !== 0) {
         <div class="bg-white rounded-xl shadow-md p-4 ">
@@ -19,7 +19,7 @@
               @for (raw of cat.value | keyvalue; track raw.key) {
                 <tr class="hover:bg-gray-50" [ngClass]="{'border-b border-gray-300': $index !== cat.value.size - 1}">
                   <td class="p-2">{{ $index + 1 }}</td>
-                  <td class="p-2 font-medium">{{ raw.key}}</td>
+                  <td class="p-2 font-medium">{{ raw.key }}</td>
                   <td class="p-2">
                     @for (teamSuspension of raw.value; track teamSuspension.name) {
                       <div class="mb-1">
@@ -40,8 +40,7 @@
       }
     }
   </div>
-}
-@else if (hasProcess() && process()) {
+} @else if (hasProcess() && process()) {
   <div class="flex flex-col items-center">
     <span>Aucun résultat</span>
   </div>

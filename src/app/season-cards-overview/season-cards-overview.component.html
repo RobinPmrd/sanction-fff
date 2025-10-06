@@ -1,0 +1,78 @@
+<div class="flex justify-center">
+  <div class="max-h-[80vh] overflow-y-auto inline-block border border-solid border-gray-300">
+    <table class="text-sm text-center">
+      <thead class="bg-blue-900 sticky top-0 text-gray-100">
+      <tr>
+        <th class="p-2">#</th>
+        @for (columnLabel of columnLabels; track columnLabel) {
+          <th
+            class="p-2 text-center"
+            [ngClass]="{'max-w-[5vw]': columnLabel.key === 'yellowCards'|| columnLabel.key === 'redCards' || columnLabel.key === 'whiteCards' || columnLabel.key === 'totalCards'}"
+          >
+            <div
+              class="flex hover:cursor-pointer hover:text-gray-300 items-center"
+              (click)="onSortColumn(columnLabel.key)"
+              [ngClass]="{'gap-2': columnLabel.key !== 'yellowCards'&& columnLabel.key !== 'redCards' && columnLabel.key !== 'whiteCards' && columnLabel.key !== 'totalCards'}"
+            >
+              <span>{{ columnLabel.label }}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                class="size-4 transition-transform duration-300 shrink-0"
+                [ngClass]="{'rotate-180': sortColumn() === columnLabel.key && sortDirection() === 'desc'}">
+                >
+                @if (sortColumn() === columnLabel.key) {
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z"
+                    clip-rule="evenodd"
+                    fill="currentColor"
+                  />
+                }
+              </svg>
+            </div>
+          </th>
+        }
+      </tr>
+      </thead>
+      @for (raw of cardsHistoric(); track raw.player) {
+        <tr class="hover:bg-blue-50 transition-colors duration-150 even:bg-gray-50">
+          <td class="p-2">
+            @switch ($index) {
+              @case (0) {
+                {{ '🥇' }}
+              }
+              @case (1) {
+                {{ '🥈' }}
+              }
+              @case (2) {
+                {{ '🥉' }}
+              }
+              @default {
+                {{ $index + 1 }}
+              }
+            }
+          </td>
+          <td class="p-2 text-left font-medium max-w-[15vw]">{{ raw.player }}</td>
+          <td class="p-2 text-left">{{ raw.subcategory }}</td>
+          <td class="p-2">{{ raw.yellowCards }}</td>
+          <td class="p-2">{{ raw.redCards }}</td>
+          <td class="p-2">{{ raw.whiteCards }}</td>
+          <td class="p-2">{{ raw.totalCards }}</td>
+          <td class="p-2 text-left">
+            <div class="flex flex-col gap-1 w-[20vw]">
+              @for (reason of raw.reasons; track $index) {
+                @if (reason.number > 1) {
+                  <span>{{ reason.label + ' (x' + reason.number + ')' }}</span>
+                } @else {
+                  <span>{{ reason.label }}</span>
+                }
+              }
+            </div>
+          </td>
+          <td class="p-2 text-blue-800 font-bold">{{ raw.totalCost + '€' }}</td>
+        </tr>
+      }
+    </table>
+  </div>
+</div>

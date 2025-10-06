@@ -5,9 +5,11 @@ export interface Sanction {
   dateDeffet: Date,
   dateDeFin: Date | null,
   libelleDecision: string,
+  libelleMotif: string | null,
   libelleSousCategorie: string,
-  nbreCartonsJaunes: number,
+  nbreCartonsJaunes: number | null,
   cartonRouge: 'Oui' | 'Non'
+  sommeTotale: number | null
 }
 
 export interface Match {
@@ -15,12 +17,12 @@ export interface Match {
   nomAbrege: string,
   numeroPhase: number,
   numeroDeJournee: number,
-  numeroDeTour: number | string,
+  numeroDeTour: number | null,
   numeroMatch: number,
   categorieEquipeLocale: string,
   equipeLocale: string,
   dateDuMatch: Date,
-  dateReport: Date | string
+  dateReport: Date | null
 }
 
 export interface TeamSuspension {
