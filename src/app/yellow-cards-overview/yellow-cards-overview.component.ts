@@ -1,6 +1,8 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, ElementRef, input, QueryList, ViewChildren } from '@angular/core';
 import { Sanction } from '../app.model';
 import { DatePipe } from '@angular/common';
+import { generatePdf } from '../utils';
+import moment from 'moment';
 
 interface YellowCardData {
   player: string,
@@ -17,6 +19,8 @@ interface YellowCardData {
   templateUrl: './yellow-cards-overview.component.html',
 })
 export class YellowCardsOverviewComponent {
+  @ViewChildren('table') tables!: QueryList<ElementRef<HTMLTableElement>>;
+
   sanctionPerPlayer = input.required<Map<string, Sanction[]>>();
   yellowCardsData = computed(() => {
     const yellowCardsData: YellowCardData[] = [];
@@ -30,6 +34,8 @@ export class YellowCardsOverviewComponent {
     yellowCardsData.sort((a, b) => this.sortByYellowCardAndEndDate(a, b));
     return yellowCardsData;
   });
+
+  pdfTitle = `Cartons jaunes actifs au ${moment().format('DD/MM/YYYY')}`;
 
   buildYellowCardData(sanctions: Sanction[], player: string, today: Date): YellowCardData {
     const yellowCardData: YellowCardData = {
@@ -62,4 +68,6 @@ export class YellowCardsOverviewComponent {
     }
     return a.number > b.number ? -1 : 1;
   }
+
+  protected readonly generatePdf = generatePdf;
 }

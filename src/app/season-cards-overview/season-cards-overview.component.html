@@ -1,6 +1,6 @@
-<div class="flex justify-center">
+<div class="flex justify-center gap-5">
   <div class="max-h-[80vh] overflow-y-auto inline-block border border-solid border-gray-300">
-    <table class="text-sm text-center">
+    <table #table class="text-sm text-center">
       <thead class="bg-blue-900 sticky top-0 text-gray-100">
       <tr>
         <th class="p-2">#</th>
@@ -35,44 +35,65 @@
         }
       </tr>
       </thead>
-      @for (raw of cardsHistoric(); track raw.player) {
-        <tr class="hover:bg-blue-50 transition-colors duration-150 even:bg-gray-50">
-          <td class="p-2">
-            @switch ($index) {
-              @case (0) {
-                {{ '🥇' }}
-              }
-              @case (1) {
-                {{ '🥈' }}
-              }
-              @case (2) {
-                {{ '🥉' }}
-              }
-              @default {
-                {{ $index + 1 }}
-              }
-            }
-          </td>
-          <td class="p-2 text-left font-medium max-w-[15vw]">{{ raw.player }}</td>
-          <td class="p-2 text-left">{{ raw.subcategory }}</td>
-          <td class="p-2">{{ raw.yellowCards }}</td>
-          <td class="p-2">{{ raw.redCards }}</td>
-          <td class="p-2">{{ raw.whiteCards }}</td>
-          <td class="p-2">{{ raw.totalCards }}</td>
-          <td class="p-2 text-left">
-            <div class="flex flex-col gap-1 w-[20vw]">
-              @for (reason of raw.reasons; track $index) {
-                @if (reason.number > 1) {
-                  <span>{{ reason.label + ' (x' + reason.number + ')' }}</span>
-                } @else {
-                  <span>{{ reason.label }}</span>
+      <tbody>
+        @for (raw of cardsHistoric(); track raw.player) {
+          <tr class="hover:bg-blue-50 transition-colors duration-150 even:bg-gray-50">
+            <td class="p-2">
+              @switch ($index) {
+                @case (0) {
+                  {{ '🥇' }}
+                }
+                @case (1) {
+                  {{ '🥈' }}
+                }
+                @case (2) {
+                  {{ '🥉' }}
+                }
+                @default {
+                  {{ $index + 1 }}
                 }
               }
-            </div>
-          </td>
-          <td class="p-2 text-blue-800 font-bold">{{ raw.totalCost + '€' }}</td>
-        </tr>
-      }
+            </td>
+            <td class="p-2 text-left font-medium max-w-[15vw]">{{ raw.player }}</td>
+            <td class="p-2 text-left">{{ raw.subcategory }}</td>
+            <td class="p-2">{{ raw.yellowCards }}</td>
+            <td class="p-2">{{ raw.redCards }}</td>
+            <td class="p-2">{{ raw.whiteCards }}</td>
+            <td class="p-2">{{ raw.totalCards }}</td>
+            <td class="p-2 text-left">
+              <div class="flex flex-col gap-1 w-[20vw]">
+                @for (reason of raw.reasons; track $index) {
+                  @if (reason.number > 1) {
+                    <span>{{ reason.label + ' (x' + reason.number + ') ' }}</span>
+                  } @else {
+                    <span>{{ reason.label + ' ' }}</span>
+                  }
+                }
+              </div>
+            </td>
+            <td class="p-2 text-blue-800 font-bold">{{ raw.totalCost + '€' }}</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot class="bg-blue-900 text-gray-100 font-bold border-t border-blue-800 sticky bottom-0">
+      <tr>
+        <td colspan="3" class="text-right p-2">Totaux :</td>
+        <td class="p-2">{{ totals().yellowCards }}</td>
+        <td class="p-2">{{ totals().redCards }}</td>
+        <td class="p-2">{{ totals().whiteCards }}</td>
+        <td class="p-2">{{ totals().totalCards }}</td>
+        <td></td>
+        <td class="p-2">{{ totals().totalCost + '€' }}</td>
+      </tr>
+      </tfoot>
     </table>
+  </div>
+  <div>
+    <button
+      class="bg-blue-900 hover:bg-blue-950 hover:cursor-pointer text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+      (click)="generatePdf(tables, 'palmares-cartons', pdfTitle, formatCell)"
+    >
+      Exporter
+    </button>
   </div>
 </div>

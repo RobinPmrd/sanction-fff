@@ -1,6 +1,9 @@
-import { Component, computed, input, signal } from '@angular/core';
+import { Component, computed, ElementRef, input, QueryList, signal, ViewChildren } from '@angular/core';
 import { Sanction } from '../app.model';
 import { NgClass } from '@angular/common';
+import { CellHookData } from 'jspdf-autotable'
+import { generatePdf } from '../utils';
+import moment from 'moment/moment';
 
 interface CardHistoric {
   player: string,
@@ -33,11 +36,14 @@ type CardHistoricKey = keyof CardHistoric;
   templateUrl: './season-cards-overview.component.html',
 })
 export class SeasonCardsOverviewComponent {
+  @ViewChildren('table') tables!: QueryList<ElementRef<HTMLTableElement>>;
+
   columnLabels: ColumnMappingLabelKey[] = [
     { label: 'Nom', key: 'player' }, { label: 'Sous-catégorie', key: 'subcategory' }, { label: 'Carton jaunes', key: 'yellowCards' }, { label: 'Carton rouges', key: 'redCards' },
     { label: 'Carton blancs', key: 'whiteCards' }, { label: 'Total cartons', key: 'totalCards' }, { label: 'Motifs', key: 'reasons' }, { label: 'Amende totale', key: 'totalCost' }
   ]
   initialSorting: CardHistoricKey[] = ['totalCost', 'totalCards', 'redCards', 'yellowCards', 'whiteCards', 'player', 'subcategory'];
+  pdfTitle = `Palmarès des cartons au ${moment().format('DD/MM/YYYY')}`;
 
   sanctionPerPlayer = input.required<Map<string, Sanction[]>>();
   cardsHistoric = computed(() => {
@@ -49,6 +55,16 @@ export class SeasonCardsOverviewComponent {
     cardsHistoric.sort((a, b) => this.sortRaw(a, b));
     return cardsHistoric;
   });
+  totals = computed(() => {
+    const data = this.cardsHistoric();
+    return {
+      yellowCards: data.reduce((sum, r) => sum + (r.yellowCards || 0), 0),
+      redCards: data.reduce((sum, r) => sum + (r.redCards || 0), 0),
+      whiteCards: data.reduce((sum, r) => sum + (r.whiteCards || 0), 0),
+      totalCards: data.reduce((sum, r) => sum + (r.totalCards || 0), 0),
+      totalCost: data.reduce((sum, r) => sum + (r.totalCost || 0), 0)
+    };
+  })
   currentSorting = signal(this.initialSorting);
   sortDirection = signal<'asc' | 'desc'>('desc');
   sortColumn = signal<CardHistoricKey>('totalCost');
@@ -120,4 +136,13 @@ export class SeasonCardsOverviewComponent {
       return newSorting;
     });
   }
+
+  formatCell(data: CellHookData) {
+    data.cell.text = data.cell.text.map(text => text.replace(' >', '')
+      .replace('🥇', '1')
+      .replace('🥈', '2')
+      .replace('🥉', '3'));
+  }
+
+  protected readonly generatePdf = generatePdf;
 }

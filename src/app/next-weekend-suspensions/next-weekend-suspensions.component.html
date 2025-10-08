@@ -1,44 +1,60 @@
 @if (displayResult()) {
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-    @for (cat of suspendedPlayersByCategory() | keyvalue; track cat.key) {
-      @if (cat.value.size !== 0) {
-        <div class="bg-white rounded-xl shadow-md p-4 ">
-          <h2 class="text-lg text-center font-semibold mb-4 text-blue-600 border-b pb-2">
-            Catégorie : {{ cat.key.replace('Libre /', '') }}
-          </h2>
-
-          <div class="overflow-x-auto">
-            <table class="w-full border border-solid border-gray-300 border-collapse border-spacing-0 text-sm rounded-md">
-              <thead class="bg-gray-100 text-left">
-              <tr class="border-b border-b-gray-300">
-                <th class="p-2 text-gray-800">#</th>
-                <th class="p-2 text-gray-800">Nom</th>
-                <th class="p-2 text-gray-800">Équipes</th>
-              </tr>
-              </thead>
-              @for (raw of cat.value | keyvalue; track raw.key) {
-                <tr class="hover:bg-gray-50" [ngClass]="{'border-b border-gray-300': $index !== cat.value.size - 1}">
-                  <td class="p-2">{{ $index + 1 }}</td>
-                  <td class="p-2 font-medium">{{ raw.key }}</td>
-                  <td class="p-2">
-                    @for (teamSuspension of raw.value; track teamSuspension.name) {
-                      <div class="mb-1">
-                        <span class="text-gray-700">{{ teamSuspension.name }}</span>
-                        <span class="ml-2 text-sm text-gray-500">
-                          <span class="font-semibold text-blue-600">{{ teamSuspension.remaining }}</span>
-                          {{ teamSuspension.remaining > 1 ? 'matchs restants' : 'match restant' }}
-                        </span>
-                        <br>
-                      </div>
-                    }
-                  </td>
+  <div class="flex gap-5 justify-center">
+    <div class="flex flex-wrap gap-5 items-start">
+      @for (cat of suspendedPlayersByCategory() | keyvalue; track cat.key) {
+        @if (cat.value.size !== 0) {
+          <div class="bg-white rounded-xl shadow-md p-4 border border-solid border-gray-100">
+            <div class="overflow-x-auto">
+              <table #table class="w-full text-sm">
+                <thead>
+                <tr>
+                  <th
+                    class="text-lg text-center font-semibold mb-4 text-blue-600 pb-4"
+                    colspan="3"
+                  >
+                    Catégorie : {{ cat.key.replace('Libre /', '') }}
+                  </th>
                 </tr>
-              }
-            </table>
+                <tr class="bg-blue-900 text-gray-100 text-left">
+                  <th class="p-2">#</th>
+                  <th class="p-2">Nom</th>
+                  <th class="p-2">Équipes</th>
+                </tr>
+                </thead>
+                <tbody class="border border-solid border-gray-300">
+                  @for (raw of cat.value | keyvalue; track raw.key) {
+                    <tr class="hover:bg-blue-50 transition-colors duration-150 even:bg-gray-50" [ngClass]="{'border-b border-gray-300': $index !== cat.value.size - 1}">
+                      <td class="p-2">{{ $index + 1 }}</td>
+                      <td class="p-2 font-medium">{{ raw.key }}</td>
+                      <td class="p-2">
+                        @for (teamSuspension of raw.value; track teamSuspension.name) {
+                          <div class="mb-1">
+                            <span class="text-gray-700">{{ teamSuspension.name + ' : ' }}</span>
+                            <span class="text-sm text-gray-500">
+                          <span class="font-semibold text-blue-600">{{ teamSuspension.remaining }}</span>
+                              {{ teamSuspension.remaining > 1 ? 'matchs restants' : 'match restant' }}
+                        </span>
+                            <br>
+                          </div>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        }
       }
-    }
+    </div>
+    <div>
+      <button
+        class="bg-blue-900 hover:bg-blue-950 hover:cursor-pointer text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+        (click)="generatePdf(tables, 'suspensions', pdfTitle)"
+      >
+        Exporter
+      </button>
+    </div>
   </div>
 } @else if (hasProcess() && process()) {
   <div class="flex flex-col items-center">

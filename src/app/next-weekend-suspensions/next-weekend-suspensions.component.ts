@@ -1,6 +1,8 @@
-import { Component, computed, effect, input, signal } from '@angular/core';
+import { Component, computed, effect, ElementRef, input, QueryList, signal, ViewChildren } from '@angular/core';
 import { KeyValuePipe, NgClass } from '@angular/common';
 import { Match, Sanction, TeamSuspension } from '../app.model';
+import { generatePdf } from '../utils';
+import moment from 'moment/moment';
 
 @Component({
   selector: 'next-weekend-suspensions',
@@ -11,6 +13,8 @@ import { Match, Sanction, TeamSuspension } from '../app.model';
   templateUrl: './next-weekend-suspensions.component.html',
 })
 export class NextWeekendSuspensionsComponent {
+  @ViewChildren('table') tables!: QueryList<ElementRef<HTMLTableElement>>;
+
   sanctionPerPlayer = input.required<Map<string, Sanction[]>>();
   matches = input.required<Match[]>();
   process = input(false);
@@ -27,7 +31,18 @@ export class NextWeekendSuspensionsComponent {
   suspendedPlayersByCategory = signal(new Map<string, Map<string, TeamSuspension[]>>);
   displayResult = computed(() => this.hasProcess() && this.suspendedPlayersByCategory().size !== 0);
 
+  pdfTitle!: string;
+
   constructor() {
+    const today = moment();
+    const nextSaturday = today.isoWeekday() <= 6
+      ? today.clone().isoWeekday(6)
+      : today.clone().add(1, 'week').isoWeekday(6);
+    const saturdayDate = nextSaturday.format('DD/MM/YYYY');
+    const nextSunday = nextSaturday.add(1, 'day');
+    const sundayDate = nextSunday.format('DD/MM/YYYY');
+    this.pdfTitle = `Joueurs suspendus – Week-end du ${saturdayDate} au ${sundayDate}`;
+
     effect(() => {
       if (this.process()) {
         this.sanctionAnalysis();
@@ -62,7 +77,7 @@ export class NextWeekendSuspensionsComponent {
               if (matchesPlayedSinceLastSuspension < lastNbMatchesSuspension) {
                 const suspendedTeams = suspendedPlayers.get(player) ?? [];
                 suspendedTeams.push({
-                  name: team.split(' Libre')[0],
+                  name: team.split(' Libre')[0].split(' Foot Entreprise')[0],
                   remaining: lastNbMatchesSuspension - matchesPlayedSinceLastSuspension
                 });
                 suspendedPlayers.set(player, suspendedTeams);
@@ -99,4 +114,6 @@ export class NextWeekendSuspensionsComponent {
     }
     return count;
   }
+
+  protected readonly generatePdf = generatePdf;
 }
