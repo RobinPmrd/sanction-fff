@@ -32,15 +32,15 @@ export function generatePdf(tables: QueryList<ElementRef<HTMLTableElement>>, fil
   doc.text(title, doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
 
   let startY = 25;
-  tables.forEach(table => {
+  tables.forEach((table, index) => {
     autoTable(doc, {
       html: table.nativeElement,
       headStyles: { fillColor: '#1c398e', textColor: '#ffffff', fontStyle: 'bold', valign: 'middle', halign: 'center' },
-      bodyStyles: { valign: 'middle', halign: 'center', overflow: "linebreak" },
+      bodyStyles: { valign: 'middle', halign: 'center' },
       footStyles: { fillColor: '#1c398e', textColor: '#ffffff', fontStyle: 'bold' },
       showFoot: 'lastPage',
       didParseCell: didParseCell,
-      startY: startY,
+      startY: index === 0 ? startY : undefined,
     });
   });
   doc.save(`${filename}-${moment().format('DD-MM-YYYY')}.pdf`);
