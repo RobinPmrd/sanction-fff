@@ -1,6 +1,6 @@
 import moment from 'moment/moment';
 import { jsPDF } from 'jspdf';
-import { autoTable, CellHook } from 'jspdf-autotable';
+import { autoTable, CellHook, MarginPaddingInput, Styles } from 'jspdf-autotable';
 import { ElementRef, QueryList } from '@angular/core';
 
 export function parseValue(value: any): Date | null {
@@ -23,7 +23,8 @@ export function toCamelCase(str: string): string {
     .replace(/[^\w]/g, "");
 }
 
-export function generatePdf(tables: QueryList<ElementRef<HTMLTableElement>>, filename: string, title: string, didParseCell?: CellHook) {
+export function generatePdf(tables: QueryList<ElementRef<HTMLTableElement>>, filename: string, title: string, didParseCell?: CellHook,
+                            columnStyles?: { [key: string]: Partial<Styles> }, margin?: MarginPaddingInput) {
   const doc = new jsPDF();
 
   doc.setFont('helvetica', 'bold');
@@ -41,6 +42,8 @@ export function generatePdf(tables: QueryList<ElementRef<HTMLTableElement>>, fil
       showFoot: 'lastPage',
       didParseCell: didParseCell,
       startY: index === 0 ? startY : undefined,
+      columnStyles: columnStyles,
+      margin: margin
     });
   });
   doc.save(`${filename}-${moment().format('DD-MM-YYYY')}.pdf`);

@@ -36,6 +36,9 @@ export class YellowCardsOverviewComponent {
   });
 
   pdfTitle = `Cartons jaunes actifs au ${moment().format('DD/MM/YYYY')}`;
+  columnStyles = {
+    4: { cellWidth: 37.84 },
+  }
 
   buildYellowCardData(sanctions: Sanction[], player: string, today: Date): YellowCardData {
     const yellowCardData: YellowCardData = {
@@ -60,7 +63,6 @@ export class YellowCardsOverviewComponent {
     }
     return sanction.nbreCartonsJaunes === 1;
   }
-
 
   sortByYellowCardAndEndDate(a: YellowCardData, b: YellowCardData) {
     if (a.number === b.number) {

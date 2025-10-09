@@ -1,7 +1,7 @@
 import { Component, computed, ElementRef, input, QueryList, signal, ViewChildren } from '@angular/core';
 import { Sanction } from '../app.model';
 import { NgClass } from '@angular/common';
-import { CellHookData } from 'jspdf-autotable'
+import { CellHookData, MarginPaddingInput } from 'jspdf-autotable'
 import { generatePdf } from '../utils';
 import moment from 'moment/moment';
 
@@ -44,6 +44,20 @@ export class SeasonCardsOverviewComponent {
   ]
   initialSorting: CardHistoricKey[] = ['totalCost', 'totalCards', 'redCards', 'yellowCards', 'whiteCards', 'player', 'subcategory'];
   pdfTitle = `Palmarès des cartons au ${moment().format('DD/MM/YYYY')}`;
+  columnStyles = {
+    0: { cellWidth: 9.35 },
+    1: { cellWidth: 32.25 },
+    3: { cellWidth: 14.87 },
+    4: { cellWidth: 14.90 },
+    5: { cellWidth: 14.87 },
+    6: { cellWidth: 16.1925 },
+    7: { cellWidth: 40 },
+    8: { cellWidth: 21.52 },
+  }
+  margin: MarginPaddingInput = {
+    left: 8,
+    right: 8
+  }
 
   sanctionPerPlayer = input.required<Map<string, Sanction[]>>();
   cardsHistoric = computed(() => {
