@@ -31,9 +31,8 @@
                           <div class="mb-1">
                             <span class="text-gray-700">{{ teamSuspension.name + ' : ' }}</span>
                             <span class="text-sm text-gray-500">
-                          <span class="font-semibold text-blue-600">{{ teamSuspension.remaining }}</span>
-                              {{ teamSuspension.remaining > 1 ? 'matchs restants' : 'match restant' }}
-                        </span>
+                                <span class="font-semibold text-blue-600">{{ teamSuspension.remaining | remainingMatches }}</span>
+                            </span>
                             <br>
                           </div>
                         }

@@ -26,7 +26,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         categorieEquipeLocale: "Libre / Senior",
         equipeLocale: "TEAM 1",
         dateDuMatch: new Date("2024-08-09"),
-        dateReport: ""
+        dateReport: null
       },
       {
         nomAbrege: "REG 1",
@@ -38,7 +38,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         categorieEquipeLocale: "Libre / Senior",
         equipeLocale: "TEAM 1",
         dateDuMatch: new Date("2024-09-07"),
-        dateReport: ""
+        dateReport: null
       },
       {
         nomAbrege: "REG 1",
@@ -50,7 +50,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         categorieEquipeLocale: "Libre / Senior",
         equipeLocale: "TEAM 1",
         dateDuMatch: new Date("2024-09-16"),
-        dateReport: ""
+        dateReport: null
       },
       {
         nomAbrege: "REG 1",
@@ -62,7 +62,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         categorieEquipeLocale: "Libre / Senior",
         equipeLocale: "TEAM 1",
         dateDuMatch: new Date("2024-09-23"),
-        dateReport: ""
+        dateReport: null
       },
       {
         nomAbrege: "REG 1",
@@ -86,7 +86,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         categorieEquipeLocale: "Libre / Senior",
         equipeLocale: "TEAM 2",
         dateDuMatch: new Date("2024-09-07"),
-        dateReport: ""
+        dateReport: null
       },
       {
         nomAbrege: "REG 3",
@@ -98,7 +98,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         categorieEquipeLocale: "Libre / Senior",
         equipeLocale: "TEAM 2",
         dateDuMatch: new Date("2024-09-23"),
-        dateReport: ""
+        dateReport: null
       },
       {
         nomAbrege: "REG 3",
@@ -122,7 +122,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         categorieEquipeLocale: "Libre / Senior",
         equipeLocale: "TEAM 2",
         dateDuMatch: new Date("2024-08-09"),
-        dateReport: ""
+        dateReport: null
       },
       {
         nomAbrege: "U18D1M",
@@ -134,7 +134,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         categorieEquipeLocale: "Libre / U19 - U18",
         equipeLocale: "TEAM 21",
         dateDuMatch: new Date("2024-09-16"),
-        dateReport: ""
+        dateReport: null
       },
       {
         nomAbrege: "U18D1M",
@@ -146,7 +146,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         categorieEquipeLocale: "Libre / U19 - U18",
         equipeLocale: "TEAM 21",
         dateDuMatch: new Date("2024-09-23"),
-        dateReport: ""
+        dateReport: null
       },
       {
         nomAbrege: "U18D1M",
@@ -158,7 +158,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         categorieEquipeLocale: "Libre / U19 - U18",
         equipeLocale: "TEAM 21",
         dateDuMatch: new Date("2024-09-30"),
-        dateReport: ""
+        dateReport: null
       },
       {
         nomAbrege: "REG 1",
@@ -170,7 +170,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         categorieEquipeLocale: "Libre / Senior",
         equipeLocale: "TEAM 1",
         dateDuMatch: new Date("2024-05-18"),
-        dateReport: ""
+        dateReport: null
       }
     ]);
   })
@@ -493,5 +493,28 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         remaining: 1
       }
     ]);
+  });
+
+  it('should not be suspended with Team 2 when effect date in the future', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2024-10-11'));
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['John Doe', [{
+        competition: 'Régional 1 Intersport',
+        nomPrenomPersonne: 'John Doe',
+        libelleDecision: '1 matchs de suspension',
+        dateDeffet: new Date('2024-10-14'),
+        libelleSousCategorie: 'Libre / Senior',
+        numeroPersonne: 1,
+        dateDeFin: "",
+        nbreCartonsJaunes: 0,
+        cartonRouge: 'Oui'
+      }]]
+    ]));
+
+    // WHEN
+    nextWeekendSuspensionsComponent.sanctionAnalysis();
+
+    // THEN
+    expect(nextWeekendSuspensionsComponent.suspendedPlayersByCategory().size).toBe(0);
   });
 });

@@ -3,12 +3,14 @@ import { KeyValuePipe, NgClass } from '@angular/common';
 import { Match, Sanction, TeamSuspension } from '../app.model';
 import { generatePdf } from '../utils';
 import moment from 'moment/moment';
+import { RemainingMatchesPipe } from '../pipe/remaining-matches.pipe';
 
 @Component({
   selector: 'next-weekend-suspensions',
   imports: [
     KeyValuePipe,
-    NgClass
+    NgClass,
+    RemainingMatchesPipe
   ],
   templateUrl: './next-weekend-suspensions.component.html',
 })
@@ -54,10 +56,13 @@ export class NextWeekendSuspensionsComponent {
 
   sanctionAnalysis() {
     this.hasProcess.set(true);
-    const today = new Date();
+    const nextSaturday = this.nextSaturday();
     const suspendedPlayersByCategory = new Map<string, Map<string, TeamSuspension[]>>();
     this.sanctionPerPlayer().forEach((sanction, player) => {
       const lastSanction = sanction[sanction.length - 1];
+      if (lastSanction.dateDeffet > nextSaturday) {
+        return;
+      }
       const lastNbMatchesSuspension = this.extractSuspensionMatches(lastSanction.libelleDecision);
       if (lastNbMatchesSuspension !== 0) {
         const suspensionCategory = this.competitionToCategory().get(lastSanction.competition);
@@ -73,7 +78,7 @@ export class NextWeekendSuspensionsComponent {
               });
               suspendedPlayers.set(player, suspendedTeams);
             } else {
-              const matchesPlayedSinceLastSuspension = matches.filter(match => this.isMatchCountable(match, lastSanction, today)).length;
+              const matchesPlayedSinceLastSuspension = matches.filter(match => this.isMatchCountable(match, lastSanction, nextSaturday)).length;
               if (matchesPlayedSinceLastSuspension < lastNbMatchesSuspension) {
                 const suspendedTeams = suspendedPlayers.get(player) ?? [];
                 suspendedTeams.push({
@@ -93,15 +98,14 @@ export class NextWeekendSuspensionsComponent {
     this.suspendedPlayersByCategory.set(new Map(suspendedPlayersByCategory));
   }
 
-  isMatchCountable(match: Match, sanction: Sanction, today: Date) {
-    if (match.dateReport) {
-      return match.dateReport >= sanction.dateDeffet && match.dateReport < today && !match.competition.includes("Amicaux");
-    }
-    return match.dateDuMatch >= sanction.dateDeffet && match.dateDuMatch < today && !match.competition.includes("Amicaux");
+  isMatchCountable(match: Match, sanction: Sanction, nextSaturday: Date) {
+    const matchDate = match.dateReport ?? match.dateDuMatch;
+    return matchDate >= sanction.dateDeffet && matchDate < nextSaturday && !match.competition.includes("Amicaux");
   }
 
   extractSuspensionMatches(text: string): number | string {
-    if (text === 'Suspendu jusqu\'à réception de rapport et décision') {
+    const cleanText = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (cleanText.includes('suspendu jusqu\'a reception')) {
       return text;
     }
     const match = text.match(/(\d+)\s+matchs?\s+de\s+suspension/i);
@@ -113,6 +117,14 @@ export class NextWeekendSuspensionsComponent {
       count++;
     }
     return count;
+  }
+
+  nextSaturday() {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
+    today.setDate(today.getDate() + daysUntilSaturday);
+    return today;
   }
 
   protected readonly generatePdf = generatePdf;

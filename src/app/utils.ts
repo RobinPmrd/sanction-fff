@@ -38,7 +38,7 @@ export function generatePdf(tables: QueryList<ElementRef<HTMLTableElement>>, fil
       html: table.nativeElement,
       headStyles: { fillColor: '#1c398e', textColor: '#ffffff', fontStyle: 'bold', valign: 'middle', halign: 'center' },
       bodyStyles: { valign: 'middle', halign: 'center' },
-      footStyles: { fillColor: '#1c398e', textColor: '#ffffff', fontStyle: 'bold' },
+      footStyles: { fillColor: '#1c398e', textColor: '#ffffff', fontStyle: 'bold', halign: 'center' },
       showFoot: 'lastPage',
       didParseCell: didParseCell,
       startY: index === 0 ? startY : undefined,
