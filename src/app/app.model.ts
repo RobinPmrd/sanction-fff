@@ -29,3 +29,9 @@ export interface TeamSuspension {
   name: string,
   remaining: number
 }
+
+export interface TeamNameMatching {
+  categorieFootclub: string
+  nomEquipeFootclub: string
+  nomEquipeInterne: string
+}

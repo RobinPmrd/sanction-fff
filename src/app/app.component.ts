@@ -1,5 +1,5 @@
 import { Component, computed, effect, signal } from '@angular/core';
-import { Match, Sanction } from './app.model';
+import { Match, Sanction, TeamNameMatching } from './app.model';
 import { FileInputComponent } from './file-input/file-input.component';
 import { NextWeekendSuspensionsComponent } from './next-weekend-suspensions/next-weekend-suspensions.component';
 import { YellowCardsOverviewComponent } from './yellow-cards-overview/yellow-cards-overview.component';
@@ -21,6 +21,7 @@ import { SeasonCardsOverviewComponent } from './season-cards-overview/season-car
 export class AppComponent {
   matches = signal<Match[]>([]);
   sanctions = signal<Sanction[]>([]);
+  teamNameMatchings = signal<TeamNameMatching[]>([]);
   launchTreatment = signal(false);
   sanctionsFileHasErrors = signal(false);
   matchesFileHasErrors = signal(false);
@@ -33,7 +34,8 @@ export class AppComponent {
 
   requiredColumns = {
     sanction: ['Nom, prénom personne', 'Compétition', 'Date d\'effet', 'Libellé décision', 'Libellé sous catégorie'],
-    match: ['Compétition', 'Catégorie équipe locale', 'Equipe locale', 'Date du match', 'Date report']
+    match: ['Compétition', 'Catégorie équipe locale', 'Equipe locale', 'Date du match', 'Date report'],
+    teamNameMatching: ['Catégorie Footclub', 'Nom équipe Footclub', 'Nom équipe interne']
   }
 
   constructor() {

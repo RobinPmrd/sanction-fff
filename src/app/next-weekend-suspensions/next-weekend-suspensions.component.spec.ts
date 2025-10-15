@@ -173,6 +173,23 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         dateReport: null
       }
     ]);
+    componentRef.setInput('teamNameMatchings', [
+      {
+        categorieFootclub: 'Libre / Senior',
+        nomEquipeFootclub: 'TEAM 1',
+        nomEquipeInterne: 'Sénior A'
+      },
+      {
+        categorieFootclub: 'Libre / Senior',
+        nomEquipeFootclub: 'TEAM 2',
+        nomEquipeInterne: 'Sénior B'
+      },
+      {
+        categorieFootclub: 'Libre / U19 - U18',
+        nomEquipeFootclub: 'TEAM 21',
+        nomEquipeInterne: 'U18 A'
+      },
+    ])
   })
 
   beforeEach(() => {
@@ -206,7 +223,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
     expect(johnDoesSuspension?.length).toBe(1);
     expect(johnDoesSuspension).toEqual([
       {
-        name: 'TEAM 2',
+        name: 'Sénior B',
         remaining: 1
       }
     ]);
@@ -238,11 +255,11 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
     expect(johnDoesSuspension?.length).toBe(2);
     expect(johnDoesSuspension).toEqual([
       {
-        name: 'TEAM 1',
+        name: 'Sénior A',
         remaining: 1
       },
       {
-        name: 'TEAM 2',
+        name: 'Sénior B',
         remaining: 2
       }
     ]);
@@ -275,11 +292,11 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
     expect(johnDoesSuspension?.length).toBe(2);
     expect(johnDoesSuspension).toEqual([
       {
-        name: 'TEAM 1',
+        name: 'Sénior A',
         remaining: 1
       },
       {
-        name: 'TEAM 2',
+        name: 'Sénior B',
         remaining: 1
       }
     ]);
@@ -311,7 +328,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
     expect(mickaelYoungSuspension?.length).toBe(1);
     expect(mickaelYoungSuspension).toEqual([
       {
-        name: 'TEAM 21',
+        name: 'U18 A',
         remaining: 1
       }
     ]);
@@ -343,7 +360,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
     expect(mickaelYoungSuspension?.length).toBe(1);
     expect(mickaelYoungSuspension).toEqual([
       {
-        name: 'TEAM 21',
+        name: 'U18 A',
         remaining: 999
       }
     ]);
@@ -375,7 +392,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
     expect(mickaelYoungSuspension?.length).toBe(1);
     expect(mickaelYoungSuspension).toEqual([
       {
-        name: 'TEAM 21',
+        name: 'U18 A',
         remaining: 3
       }
     ]);
@@ -408,11 +425,11 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
     expect(johnDoeSuspension?.length).toBe(2);
     expect(johnDoeSuspension).toEqual([
       {
-        name: 'TEAM 1',
+        name: 'Sénior A',
         remaining: 1
       },
       {
-        name: 'TEAM 2',
+        name: 'Sénior B',
         remaining: 1
       },
     ]);
@@ -489,7 +506,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
     expect(johnDoeSuspension?.length).toBe(1);
     expect(johnDoeSuspension).toEqual([
       {
-        name: 'TEAM 1',
+        name: 'Sénior A',
         remaining: 1
       }
     ]);

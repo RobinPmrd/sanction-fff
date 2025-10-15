@@ -23,6 +23,13 @@
           [(hasErrors)]="matchesFileHasErrors"
         >
         </file-input>
+        <file-input
+          label="Fichier de correspondance des noms d'équipes"
+          additionalInformations="colonnes requises : Catégorie Footclub, Nom équipe Footclub, Nom équipe interne"
+          [(data)]="teamNameMatchings"
+          [requiredColumns]="requiredColumns.teamNameMatching"
+        >
+        </file-input>
       </div>
       <div class="flex items-end">
         <button
@@ -64,6 +71,7 @@
         <next-weekend-suspensions
           [sanctionPerPlayer]="sanctionPerPlayer()"
           [matches]="matches()"
+          [teamNameMatchings]="teamNameMatchings()"
           [process]="launchTreatment()"
         ></next-weekend-suspensions>
       }
