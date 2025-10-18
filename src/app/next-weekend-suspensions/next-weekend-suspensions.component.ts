@@ -61,20 +61,22 @@ export class NextWeekendSuspensionsComponent {
 
   sanctionAnalysis() {
     this.hasProcess.set(true);
-    const nextSaturday = new Date();
+    const today = new Date()
+    today.setHours(0, 0, 0, 0);
     const suspendedPlayersByCategory = new Map<string, Map<string, TeamSuspension[]>>();
     this.sanctionPerPlayer().forEach((sanction, player) => {
       const lastSanction = sanction[sanction.length - 1];
-      if (lastSanction.dateDeffet > nextSaturday) {
+      const sanctionStartDate = lastSanction.dateDeffet ?? today;
+      if (sanctionStartDate > today) {
         return;
       }
-      const lastNbMatchesSuspension = this.extractSuspensionMatches(lastSanction.libelleDecision);
+      const lastNbMatchesSuspension = this.extractSuspensionMatches(lastSanction);
       if (lastNbMatchesSuspension !== 0) {
         const suspensionCategory = this.competitionToCategory().get(lastSanction.competition);
         if (suspensionCategory) {
           const suspendedPlayers = suspendedPlayersByCategory.get(suspensionCategory) ?? new Map<string, TeamSuspension[]>;
           const playerPotentialTeams = new Map([...this.matchesPerTeam().entries()].filter(([key]) => key.includes(suspensionCategory)));
-          const suspendedTeams = this.getSuspendedTeams(lastNbMatchesSuspension, playerPotentialTeams, lastSanction, nextSaturday);
+          const suspendedTeams = this.getSuspendedTeams(lastNbMatchesSuspension, playerPotentialTeams, sanctionStartDate, today);
           if (suspendedTeams.length > 0) {
             suspendedPlayers.set(player, suspendedTeams);
           }
@@ -87,7 +89,7 @@ export class NextWeekendSuspensionsComponent {
     this.suspendedPlayersByCategory.set(new Map(suspendedPlayersByCategory));
   }
 
-  getSuspendedTeams(matchesSuspensionNb: number | string, playerPotentialTeams: Map<string, Match[]>, lastSanction: Sanction, today: Date) {
+  getSuspendedTeams(matchesSuspensionNb: number | string, playerPotentialTeams: Map<string, Match[]>, sanctionStartDate: Date, today: Date) {
     const suspendedTeams: TeamSuspension[] = [];
     playerPotentialTeams.forEach((matches, team) => {
       if (typeof matchesSuspensionNb === 'string') {
@@ -96,7 +98,7 @@ export class NextWeekendSuspensionsComponent {
           remaining: 999
         });
       } else {
-        const matchesPlayedSinceLastSuspension = matches.filter(match => this.isMatchCountable(match, lastSanction, today)).length;
+        const matchesPlayedSinceLastSuspension = matches.filter(match => this.isMatchCountable(match, sanctionStartDate, today)).length;
         if (matchesPlayedSinceLastSuspension < matchesSuspensionNb) {
           suspendedTeams.push({
             name: team.split(' Libre')[0].split(' Foot Entreprise')[0],
@@ -108,22 +110,26 @@ export class NextWeekendSuspensionsComponent {
     return suspendedTeams.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  isMatchCountable(match: Match, sanction: Sanction, today: Date) {
+  isMatchCountable(match: Match, sanctionStartDate: Date, today: Date) {
     const matchDate = match.dateReport ?? match.dateDuMatch;
-    return matchDate >= sanction.dateDeffet && matchDate < today && !match.competition.includes("Amicaux");
+    return matchDate >= sanctionStartDate && matchDate < today && !match.competition.includes("Amicaux");
   }
 
-  extractSuspensionMatches(text: string): number | string {
-    const cleanText = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  extractSuspensionMatches(sanction: Sanction): number | string {
+    const decision = sanction.libelleDecision;
+    const cleanText = decision.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     if (cleanText.includes('suspendu jusqu\'a reception')) {
-      return text;
+      return decision;
     }
-    const match = text.match(/(\d+)\s+matchs?\s+de\s+suspension/i);
+    if (sanction.cartonRouge === 'Oui' && cleanText.includes('traite')) {
+      return decision;
+    }
+    const match = cleanText.match(/(\d+)\s+matchs?\s+de\s+suspension/i);
     let count: number = 0;
     if (match) {
       count += parseInt(match[1], 10);
     }
-    if (text.toLowerCase().includes('automatique')) {
+    if (cleanText.includes('automatique')) {
       count++;
     }
     return count;

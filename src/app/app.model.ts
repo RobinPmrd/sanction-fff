@@ -2,7 +2,7 @@ export interface Sanction {
   competition: string,
   numeroPersonne: number,
   nomPrenomPersonne: string,
-  dateDeffet: Date,
+  dateDeffet: Date | null,
   dateDeFin: Date | null,
   libelleDecision: string,
   libelleMotif: string | null,

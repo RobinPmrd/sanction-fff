@@ -346,6 +346,28 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
         dateDeFin: "",
         nbreCartonsJaunes: 1,
         cartonRouge: 'Non'
+      }]],
+      ['Josh Green', [{
+        competition: 'Régional 3',
+        nomPrenomPersonne: 'Josh Green',
+        libelleDecision: 'Traité le 15/10/2025',
+        dateDeffet: new Date('2024-09-06'),
+        libelleSousCategorie: 'Libre / Senior',
+        numeroPersonne: 3,
+        dateDeFin: "",
+        nbreCartonsJaunes: 0,
+        cartonRouge: 'Oui'
+      }]],
+      ['David Brook', [{
+        competition: 'Régional 3',
+        nomPrenomPersonne: 'David Brook',
+        libelleDecision: 'A traiter le 15/10/2025',
+        dateDeffet: null,
+        libelleSousCategorie: 'Libre / Senior',
+        numeroPersonne: 4,
+        dateDeFin: "",
+        nbreCartonsJaunes: 0,
+        cartonRouge: 'Oui'
       }]]
     ]));
 
@@ -353,14 +375,40 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    expect(nextWeekendSuspensionsComponent.suspendedPlayersByCategory().size).toBe(1);
-    const u19Suspension = nextWeekendSuspensionsComponent.suspendedPlayersByCategory().get('Libre / U19 - U18');
-    expect(u19Suspension?.size).toBe(1);
-    const mickaelYoungSuspension = u19Suspension?.get('Mickael Young');
+    expect(nextWeekendSuspensionsComponent.suspendedPlayersByCategory().size).toBe(2);
+    const u19Suspensions = nextWeekendSuspensionsComponent.suspendedPlayersByCategory().get('Libre / U19 - U18');
+    expect(u19Suspensions?.size).toBe(1);
+    const mickaelYoungSuspension = u19Suspensions?.get('Mickael Young');
     expect(mickaelYoungSuspension?.length).toBe(1);
     expect(mickaelYoungSuspension).toEqual([
       {
         name: 'U18 A',
+        remaining: 999
+      }
+    ]);
+    const seniorSuspensions = nextWeekendSuspensionsComponent.suspendedPlayersByCategory().get('Libre / Senior');
+    expect(seniorSuspensions?.size).toBe(2);
+    const joshGreenSuspension = seniorSuspensions?.get('Josh Green');
+    expect(joshGreenSuspension?.length).toBe(2);
+    expect(joshGreenSuspension).toEqual([
+      {
+        name: 'Sénior A',
+        remaining: 999
+      },
+      {
+        name: 'Sénior B',
+        remaining: 999
+      }
+    ]);
+    const davidBrookSuspension = seniorSuspensions?.get('David Brook');
+    expect(davidBrookSuspension?.length).toBe(2);
+    expect(davidBrookSuspension).toEqual([
+      {
+        name: 'Sénior A',
+        remaining: 999
+      },
+      {
+        name: 'Sénior B',
         remaining: 999
       }
     ]);
