@@ -25,15 +25,15 @@ export class NextWeekendSuspensionsComponent {
   hasProcess = signal(false);
 
   matchesPerTeam = computed(() =>
-    Map.groupBy(this.matches().sort((a, b) => a.dateDuMatch.getTime() - b.dateDuMatch.getTime()),
-      match => this.teamNameMatchingPerTeam().get(match.equipeLocale.trim() + match.categorieEquipeLocale.trim()) + " " + match.categorieEquipeLocale)
+    Map.groupBy(this.matches().sort((a, b) => a.dateDuMatch.getTime() - b.dateDuMatch.getTime()), match => {
+      const teamKey = this.getTeamKey(match);
+      return this.teamNameMatchingPerTeam().get(teamKey) ?? teamKey;
+    })
   );
-  competitionToCategory = computed(() => {
-    return new Map(this.matches().map(match => [match.competition, match.categorieEquipeLocale]))
-  });
   teamNameMatchingPerTeam = computed(() =>
-    new Map(this.teamNameMatchings().map(teamNameMatching => [teamNameMatching.nomEquipeFootclub.trim() + teamNameMatching.categorieFootclub.trim(), teamNameMatching.nomEquipeInterne]))
-  )
+    new Map(this.teamNameMatchings().map(teamNameMatching => [this.getTeamKey(teamNameMatching), teamNameMatching.nomEquipeInterne]))
+  );
+  categories = computed(() => Array.from(new Set(this.matches().map(match => match.categorieEquipeLocale))));
 
   suspendedPlayersByCategory = signal(new Map<string, Map<string, TeamSuspension[]>>);
   displayResult = computed(() => this.hasProcess() && this.suspendedPlayersByCategory().size !== 0);
@@ -72,11 +72,12 @@ export class NextWeekendSuspensionsComponent {
       }
       const lastNbMatchesSuspension = this.extractSuspensionMatches(lastSanction);
       if (lastNbMatchesSuspension !== 0) {
-        const suspensionCategory = this.competitionToCategory().get(lastSanction.competition);
+        const subcategory = this.getSubCategory(lastSanction.libelleSousCategorie);
+        const suspensionCategory = this.categories().find(category => category.includes(subcategory));
         if (suspensionCategory) {
           const suspendedPlayers = suspendedPlayersByCategory.get(suspensionCategory) ?? new Map<string, TeamSuspension[]>;
-          const playerPotentialTeams = new Map([...this.matchesPerTeam().entries()].filter(([key]) => key.includes(suspensionCategory)));
-          const suspendedTeams = this.getSuspendedTeams(lastNbMatchesSuspension, playerPotentialTeams, sanctionStartDate, today);
+          const playerTeams = this.getPlayerTeams(subcategory);
+          const suspendedTeams = this.getSuspendedTeams(lastNbMatchesSuspension, playerTeams, sanctionStartDate, today);
           if (suspendedTeams.length > 0) {
             suspendedPlayers.set(player, suspendedTeams);
           }
@@ -89,19 +90,20 @@ export class NextWeekendSuspensionsComponent {
     this.suspendedPlayersByCategory.set(new Map(suspendedPlayersByCategory));
   }
 
-  getSuspendedTeams(matchesSuspensionNb: number | string, playerPotentialTeams: Map<string, Match[]>, sanctionStartDate: Date, today: Date) {
+  getSuspendedTeams(matchesSuspensionNb: number | string, playerTeams: string[], sanctionStartDate: Date, today: Date) {
     const suspendedTeams: TeamSuspension[] = [];
-    playerPotentialTeams.forEach((matches, team) => {
+    playerTeams.forEach(team => {
       if (typeof matchesSuspensionNb === 'string') {
         suspendedTeams.push({
-          name: team.split(' Libre')[0],
+          name: team.split('Libre')[0],
           remaining: 999
         });
       } else {
-        const matchesPlayedSinceLastSuspension = matches.filter(match => this.isMatchCountable(match, sanctionStartDate, today)).length;
+        const teamMatches = this.matchesPerTeam().get(team) ?? [];
+        const matchesPlayedSinceLastSuspension = teamMatches.filter(match => this.isMatchCountable(match, sanctionStartDate, today)).length;
         if (matchesPlayedSinceLastSuspension < matchesSuspensionNb) {
           suspendedTeams.push({
-            name: team.split(' Libre')[0].split(' Foot Entreprise')[0],
+            name: team.split('Libre')[0].split('Foot Entreprise')[0],
             remaining: matchesSuspensionNb - matchesPlayedSinceLastSuspension
           });
         }
@@ -133,6 +135,53 @@ export class NextWeekendSuspensionsComponent {
       count++;
     }
     return count;
+  }
+
+  getTeamKey(data: Match | TeamNameMatching) {
+    if ('equipeLocale' in data) {
+      return data.equipeLocale.trim() + data.categorieEquipeLocale.trim();
+    }
+    return data.nomEquipeFootclub.trim() + data.categorieFootclub.trim();
+  }
+
+  getSubCategory(subcategory: string) {
+    if (subcategory.includes('Entreprise')) {
+      return 'Entreprise';
+    } else if ((subcategory.includes('Vétéran') && subcategory.includes('Libre')) || subcategory.includes('Senior')) {
+      return 'Libre / Senior';
+    } else {
+      const match = subcategory.match(/u\s*(\d{1,2})/i);
+      return match ? match[0] : subcategory;
+    }
+  }
+
+  getPlayerTeams(subcategory: string) {
+    const playerTeams: string[] = [];
+    this.matches().forEach(match => {
+      const teamKey = this.getTeamKey(match);
+      const teamName = this.teamNameMatchingPerTeam().get(teamKey) ?? teamKey;
+      if (!playerTeams.includes(teamName) && this.isPlayerTeam(subcategory, match)) {
+        playerTeams.push(teamName);
+      }
+    });
+    return playerTeams;
+  }
+
+  isPlayerTeam(subcategory: string, match: Match) {
+    if (!match.categorieEquipeLocale.includes(subcategory)) {
+      return false;
+    }
+    if (subcategory === 'Entreprise' || subcategory === 'Libre / Senior') {
+      return true;
+    }
+    const subcategoryNumberMatch = subcategory.match(/u\s*(\d{1,2})/i);
+    const competitionSubcategoryNumberMatch = match.competition.match(/u\s*(\d{1,2})/i);
+    if (subcategoryNumberMatch && competitionSubcategoryNumberMatch) {
+      const subcategoryNumber = Number.parseInt(subcategoryNumberMatch[1]);
+      const competitionSubcategoryNumber = Number.parseInt(competitionSubcategoryNumberMatch[1]);
+      return subcategoryNumber <= competitionSubcategoryNumber;
+    }
+    return true;
   }
 
   protected readonly generatePdf = generatePdf;

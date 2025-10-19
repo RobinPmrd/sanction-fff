@@ -334,6 +334,38 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
     ]);
   });
 
+  it('should be suspended in young category when young player suspended in senior', () => {
+    componentRef.setInput('sanctionPerPlayer', new Map([
+      ['Mickael Young', [{
+        competition: 'Régional 3',
+        nomPrenomPersonne: 'Mickael Young',
+        libelleDecision: '1 Match De Suspension Ferme (3ème avertissement)',
+        dateDeffet: new Date('2024-09-18'),
+        libelleSousCategorie: 'Libre / U18 (- 18 Ans)',
+        numeroPersonne: 2,
+        dateDeFin: "",
+        nbreCartonsJaunes: 1,
+        cartonRouge: 'Non'
+      }]]
+    ]));
+
+    // WHEN
+    nextWeekendSuspensionsComponent.sanctionAnalysis();
+
+    // THEN
+    expect(nextWeekendSuspensionsComponent.suspendedPlayersByCategory().size).toBe(1);
+    const u19Suspension = nextWeekendSuspensionsComponent.suspendedPlayersByCategory().get('Libre / U19 - U18');
+    expect(u19Suspension?.size).toBe(1);
+    const mickaelYoungSuspension = u19Suspension?.get('Mickael Young');
+    expect(mickaelYoungSuspension?.length).toBe(1);
+    expect(mickaelYoungSuspension).toEqual([
+      {
+        name: 'U18 A',
+        remaining: 1
+      }
+    ]);
+  });
+
   it('should be suspended when suspended indefinitely ', () => {
     componentRef.setInput('sanctionPerPlayer', new Map([
       ['Mickael Young', [{
