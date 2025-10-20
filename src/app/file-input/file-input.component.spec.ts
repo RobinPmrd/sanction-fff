@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FileInputComponent } from './file-input.component';
 import { Sanction } from '../app.model';
+import { setInput } from '../utils';
 
 describe('FileInputComponent', () => {
   let component: FileInputComponent<Sanction>;
@@ -11,11 +12,11 @@ describe('FileInputComponent', () => {
     await TestBed.configureTestingModule({
       imports: [FileInputComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(FileInputComponent<Sanction>);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput('requiredColumns', ['Nom, prénom personne', 'Compétition', 'Date d\'effet', 'Libellé décision', 'Libellé sous catégorie']);
+    setInput<string[]>(fixture.componentRef, 'requiredColumns', ['Nom, prénom personne', 'Compétition', 'Date d\'effet', 'Libellé décision', 'Libellé sous catégorie'])
     fixture.detectChanges();
   });
 

@@ -67,9 +67,7 @@ export class NextWeekendSuspensionsComponent {
     this.sanctionPerPlayer().forEach((sanction, player) => {
       const lastSanction = sanction[sanction.length - 1];
       const sanctionStartDate = lastSanction.dateDeffet ?? today;
-      if (sanctionStartDate > today) {
-        return;
-      }
+      sanctionStartDate.setHours(0, 0, 0, 0);
       const lastNbMatchesSuspension = this.extractSuspensionMatches(lastSanction);
       if (lastNbMatchesSuspension !== 0) {
         const subcategory = this.getSubCategory(lastSanction.libelleSousCategorie);
@@ -93,13 +91,17 @@ export class NextWeekendSuspensionsComponent {
   getSuspendedTeams(matchesSuspensionNb: number | string, playerTeams: string[], sanctionStartDate: Date, today: Date) {
     const suspendedTeams: TeamSuspension[] = [];
     playerTeams.forEach(team => {
+      const teamMatches = this.matchesPerTeam().get(team) ?? [];
+      const nextMatchDate = teamMatches.map(match => match.dateReport ?? match.dateDuMatch).find(matchDate => matchDate > today);
+      if (nextMatchDate && sanctionStartDate > nextMatchDate) {
+        return;
+      }
       if (typeof matchesSuspensionNb === 'string') {
         suspendedTeams.push({
           name: team.split('Libre')[0],
           remaining: 999
         });
       } else {
-        const teamMatches = this.matchesPerTeam().get(team) ?? [];
         const matchesPlayedSinceLastSuspension = teamMatches.filter(match => this.isMatchCountable(match, sanctionStartDate, today)).length;
         if (matchesPlayedSinceLastSuspension < matchesSuspensionNb) {
           suspendedTeams.push({

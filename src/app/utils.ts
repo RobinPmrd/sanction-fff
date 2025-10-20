@@ -1,7 +1,7 @@
 import moment from 'moment/moment';
 import { jsPDF } from 'jspdf';
 import { autoTable, CellHook, MarginPaddingInput, Styles } from 'jspdf-autotable';
-import { ElementRef, QueryList } from '@angular/core';
+import { ComponentRef, ElementRef, QueryList } from '@angular/core';
 
 export function parseValue(value: any): Date | null {
   if (value === '') {
@@ -47,4 +47,8 @@ export function generatePdf(tables: QueryList<ElementRef<HTMLTableElement>>, fil
     });
   });
   doc.save(`${filename}-${moment().format('DD-MM-YYYY')}.pdf`);
+}
+
+export function setInput<V>(componentRef: ComponentRef<any>, input: string, value: V) {
+  componentRef.setInput(input, value);
 }

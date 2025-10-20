@@ -1,6 +1,5 @@
 export interface Sanction {
   competition: string,
-  numeroPersonne: number,
   nomPrenomPersonne: string,
   dateDeffet: Date | null,
   dateDeFin: Date | null,
@@ -14,11 +13,6 @@ export interface Sanction {
 
 export interface Match {
   competition: string
-  nomAbrege: string,
-  numeroPhase: number,
-  numeroDeJournee: number,
-  numeroDeTour: number | null,
-  numeroMatch: number,
   categorieEquipeLocale: string,
   equipeLocale: string,
   dateDuMatch: Date,
