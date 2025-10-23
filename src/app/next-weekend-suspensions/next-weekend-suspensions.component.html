@@ -25,9 +25,9 @@
                   @for (raw of cat.value | keyvalue; track raw.key) {
                     <tr class="hover:bg-blue-50 transition-colors duration-150 even:bg-gray-50" [ngClass]="{'border-b border-gray-300': $index !== cat.value.size - 1}">
                       <td class="p-2">{{ $index + 1 }}</td>
-                      <td class="p-2 font-medium">{{ raw.key }}</td>
+                      <td class="p-2 font-medium">{{ raw.value.name }}</td>
                       <td class="p-2">
-                        @for (teamSuspension of raw.value; track teamSuspension.name) {
+                        @for (teamSuspension of raw.value.teams; track teamSuspension.name) {
                           <div class="mb-1">
                             <span class="text-gray-700">{{ teamSuspension.name + ' : ' }}</span>
                             <span class="text-sm text-gray-500">

@@ -14,18 +14,18 @@ export interface Sanction {
 
 export interface Match {
   competition: string
-  nomAbrege: string,
-  numeroPhase: number,
-  numeroDeJournee: number,
-  numeroDeTour: number | null,
-  numeroMatch: number,
   categorieEquipeLocale: string,
   equipeLocale: string,
   dateDuMatch: Date,
   dateReport: Date | null
 }
 
-export interface TeamSuspension {
+export interface PlayerSuspensions {
+  name: string,
+  teams: TeamRemainingSuspension[]
+}
+
+export interface TeamRemainingSuspension {
   name: string,
   remaining: number
 }

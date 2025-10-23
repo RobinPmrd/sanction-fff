@@ -28,7 +28,7 @@ export class AppComponent {
   tab = signal(0);
   errors = signal<string[]>([]);
 
-  sanctionPerPlayer = computed(() => Map.groupBy(this.sanctions(), sanction => sanction.nomPrenomPersonne));
+  sanctionPerPlayer = computed(() => Map.groupBy(this.sanctions(), sanction => sanction.numeroPersonne));
   hasErrors = computed(() => this.sanctionsFileHasErrors() || this.matchesFileHasErrors() || this.errors().length !== 0);
   disableButton = computed(() => this.sanctions().length === 0 || this.matches().length === 0 || this.hasErrors());
 

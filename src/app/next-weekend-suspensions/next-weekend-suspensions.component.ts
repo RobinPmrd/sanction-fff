@@ -1,6 +1,6 @@
 import { Component, computed, effect, ElementRef, input, QueryList, signal, ViewChildren } from '@angular/core';
 import { KeyValuePipe, NgClass } from '@angular/common';
-import { Match, Sanction, TeamNameMatching, TeamSuspension } from '../app.model';
+import { Match, Sanction, TeamNameMatching, PlayerSuspensions, TeamRemainingSuspension } from '../app.model';
 import { generatePdf } from '../utils';
 import moment from 'moment/moment';
 import { RemainingMatchesPipe } from '../pipe/remaining-matches.pipe';
@@ -17,7 +17,7 @@ import { RemainingMatchesPipe } from '../pipe/remaining-matches.pipe';
 export class NextWeekendSuspensionsComponent {
   @ViewChildren('table') tables!: QueryList<ElementRef<HTMLTableElement>>;
 
-  sanctionPerPlayer = input.required<Map<string, Sanction[]>>();
+  sanctionPerPlayer = input.required<Map<number, Sanction[]>>();
   matches = input.required<Match[]>();
   teamNameMatchings = input<TeamNameMatching[]>([]);
   process = input(false);
@@ -35,7 +35,7 @@ export class NextWeekendSuspensionsComponent {
   );
   categories = computed(() => Array.from(new Set(this.matches().map(match => match.categorieEquipeLocale))));
 
-  suspendedPlayersByCategory = signal(new Map<string, Map<string, TeamSuspension[]>>);
+  suspendedPlayersByCategory = signal(new Map<string, Map<number, PlayerSuspensions>>);
   displayResult = computed(() => this.hasProcess() && this.suspendedPlayersByCategory().size !== 0);
 
   pdfTitle!: string;
@@ -63,26 +63,26 @@ export class NextWeekendSuspensionsComponent {
     this.hasProcess.set(true);
     const today = new Date()
     today.setHours(0, 0, 0, 0);
-    const suspendedPlayersByCategory = new Map<string, Map<string, TeamSuspension[]>>();
+    const suspendedPlayersByCategory = new Map<string, Map<number, PlayerSuspensions>>();
     this.sanctionPerPlayer().forEach((sanction, player) => {
       const lastSanction = sanction[sanction.length - 1];
-      const sanctionStartDate = lastSanction.dateDeffet ?? today;
-      if (sanctionStartDate > today) {
-        return;
-      }
       const lastNbMatchesSuspension = this.extractSuspensionMatches(lastSanction);
       if (lastNbMatchesSuspension !== 0) {
         const subcategory = this.getSubCategory(lastSanction.libelleSousCategorie);
         const suspensionCategory = this.categories().find(category => category.includes(subcategory));
         if (suspensionCategory) {
-          const suspendedPlayers = suspendedPlayersByCategory.get(suspensionCategory) ?? new Map<string, TeamSuspension[]>;
+          const categorySuspendedPlayers = suspendedPlayersByCategory.get(suspensionCategory) ?? new Map<number, PlayerSuspensions>;
           const playerTeams = this.getPlayerTeams(subcategory);
-          const suspendedTeams = this.getSuspendedTeams(lastNbMatchesSuspension, playerTeams, sanctionStartDate, today);
-          if (suspendedTeams.length > 0) {
-            suspendedPlayers.set(player, suspendedTeams);
+          const teamSuspensions = this.getTeamSuspensions(lastNbMatchesSuspension, playerTeams, lastSanction.dateDeffet, today);
+          if (teamSuspensions.length > 0) {
+            const playerSuspensions: PlayerSuspensions = {
+              name: lastSanction.nomPrenomPersonne,
+              teams: teamSuspensions
+            };
+            categorySuspendedPlayers.set(player, playerSuspensions);
           }
-          if (suspendedPlayers.size !== 0) {
-            suspendedPlayersByCategory.set(suspensionCategory, suspendedPlayers);
+          if (categorySuspendedPlayers.size !== 0) {
+            suspendedPlayersByCategory.set(suspensionCategory, categorySuspendedPlayers);
           }
         }
       }
@@ -90,26 +90,32 @@ export class NextWeekendSuspensionsComponent {
     this.suspendedPlayersByCategory.set(new Map(suspendedPlayersByCategory));
   }
 
-  getSuspendedTeams(matchesSuspensionNb: number | string, playerTeams: string[], sanctionStartDate: Date, today: Date) {
-    const suspendedTeams: TeamSuspension[] = [];
+  getTeamSuspensions(matchesSuspensionNb: number | string, playerTeams: string[], sanctionStartDate: Date | null, today: Date) {
+    const teamSuspensions: TeamRemainingSuspension[] = [];
+    const startDate = sanctionStartDate ?? today;
+    startDate.setHours(0, 0, 0, 0);
     playerTeams.forEach(team => {
+      const teamMatches = this.matchesPerTeam().get(team) ?? [];
+      const nextMatchDate = teamMatches.map(match => match.dateReport ?? match.dateDuMatch).find(matchDate => matchDate > today);
+      if (nextMatchDate && startDate > nextMatchDate) {
+        return;
+      }
       if (typeof matchesSuspensionNb === 'string') {
-        suspendedTeams.push({
+        teamSuspensions.push({
           name: team.split('Libre')[0],
           remaining: 999
         });
       } else {
-        const teamMatches = this.matchesPerTeam().get(team) ?? [];
-        const matchesPlayedSinceLastSuspension = teamMatches.filter(match => this.isMatchCountable(match, sanctionStartDate, today)).length;
+        const matchesPlayedSinceLastSuspension = teamMatches.filter(match => this.isMatchCountable(match, startDate, today)).length;
         if (matchesPlayedSinceLastSuspension < matchesSuspensionNb) {
-          suspendedTeams.push({
+          teamSuspensions.push({
             name: team.split('Libre')[0].split('Foot Entreprise')[0],
             remaining: matchesSuspensionNb - matchesPlayedSinceLastSuspension
           });
         }
       }
     });
-    return suspendedTeams.sort((a, b) => a.name.localeCompare(b.name));
+    return teamSuspensions.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   isMatchCountable(match: Match, sanctionStartDate: Date, today: Date) {
