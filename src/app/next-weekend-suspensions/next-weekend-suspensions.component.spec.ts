@@ -1,11 +1,23 @@
 import { NextWeekendSuspensionsComponent } from './next-weekend-suspensions.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ComponentRef } from '@angular/core';
-import { Match, Sanction, TeamNameMatching, PlayerSuspensions, TeamRemainingSuspension } from '../app.model';
+import { Match, PlayerSuspensions, Sanction, TeamNameMatching } from '../app.model';
 import { setInput } from '../utils';
-import { seniorTeam1Match, seniorTeam2Match, seniorPlayer, u18Team1Match, u18Player, veteranSeniorPlayer, loisirTeam1Match, loisirPlayer, enterpriseTeam1Match, veteranEnterprisePlayer, enterprisePlayer } from '../app.component.spec';
+import {
+  enterprisePlayer,
+  enterpriseTeam1Match,
+  loisirPlayer,
+  loisirTeam1Match,
+  seniorPlayer,
+  seniorTeam1Match,
+  seniorTeam2Match,
+  u18Player,
+  u18Team1Match,
+  veteranEnterprisePlayer,
+  veteranSeniorPlayer
+} from '../app.component.spec';
 
-describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
+describe('Sanction analysis tests', () => {
   let nextWeekendSuspensionsComponent: NextWeekendSuspensionsComponent;
   const fixedToday = new Date('2024-09-21');
   let fixture: ComponentFixture<NextWeekendSuspensionsComponent>;
@@ -378,7 +390,7 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
 
     // THEN
     const playersSuspensions: PlayerSuspensions[] = [
-      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }]}
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
       [seniorPlayer.numeroPersonne], playersSuspensions);
@@ -400,16 +412,16 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
 
     // THEN
     const seniorPlayersSuspensions: PlayerSuspensions[] = [
-      { name: seniorPlayer.nomPrenomPersonne, teams: [{name: 'Sénior A', remaining: 1}, { name: 'Sénior B', remaining: 1 }]}
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 2, 'Libre / Senior',
       [seniorPlayer.numeroPersonne], seniorPlayersSuspensions);
     const u18PlayersSuspensions: PlayerSuspensions[] = [
-      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 1 }]}
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 2, 'Libre / U19 - U18',
       [u18Player.numeroPersonne], u18PlayersSuspensions);
-      
+
   });
 });
 

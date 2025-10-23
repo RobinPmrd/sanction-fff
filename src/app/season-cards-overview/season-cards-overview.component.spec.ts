@@ -15,19 +15,17 @@ describe('SeasonCardsOverviewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [SeasonCardsOverviewComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(SeasonCardsOverviewComponent);
     component = fixture.componentInstance;
     componentRef = fixture.componentRef;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
     setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
     ]));
-    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 });

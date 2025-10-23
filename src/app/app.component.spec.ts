@@ -16,10 +16,10 @@ describe('AppComponent', () => {
 
   it('should display not same season error when sanction from past season without match', () => {
     appComponent.matches.set([
-      seniorTeam1Match
+      { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-07") }
     ]);
     appComponent.sanctions.set([
-      seniorPlayer
+      { ...seniorPlayer, dateDeffet: new Date('2023-05-18') }
     ]);
 
     fixture.detectChanges();
