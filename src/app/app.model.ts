@@ -1,5 +1,6 @@
 export interface Sanction {
   competition: string,
+  numeroPersonne: number,
   nomPrenomPersonne: string,
   dateDeffet: Date | null,
   dateDeFin: Date | null,
@@ -19,7 +20,12 @@ export interface Match {
   dateReport: Date | null
 }
 
-export interface TeamSuspension {
+export interface PlayerSuspensions {
+  name: string,
+  teams: TeamRemainingSuspension[]
+}
+
+export interface TeamRemainingSuspension {
   name: string,
   remaining: number
 }

@@ -59,11 +59,11 @@ export class SeasonCardsOverviewComponent {
     right: 8
   }
 
-  sanctionPerPlayer = input.required<Map<string, Sanction[]>>();
+  sanctionPerPlayer = input.required<Map<number, Sanction[]>>();
   cardsHistoric = computed(() => {
     const cardsHistoric: CardHistoric[] = [];
-    this.sanctionPerPlayer().forEach((sanctions, player) => {
-      const cardHistoric = this.buildCardHistoric(sanctions, player);
+    this.sanctionPerPlayer().forEach((sanctions) => {
+      const cardHistoric = this.buildCardHistoric(sanctions);
       cardsHistoric.push(cardHistoric);
     })
     cardsHistoric.sort((a, b) => this.sortRaw(a, b));
@@ -83,9 +83,9 @@ export class SeasonCardsOverviewComponent {
   sortDirection = signal<'asc' | 'desc'>('desc');
   sortColumn = signal<CardHistoricKey>('totalCost');
 
-  buildCardHistoric(sanctions: Sanction[], player: string) {
+  buildCardHistoric(sanctions: Sanction[]) {
     let cardHistoric: CardHistoric = {
-      player: player,
+      player: sanctions[0].nomPrenomPersonne,
       subcategory: sanctions[0].libelleSousCategorie,
       yellowCards: 0,
       redCards: 0,

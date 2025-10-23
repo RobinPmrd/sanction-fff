@@ -21,12 +21,12 @@ interface YellowCardData {
 export class YellowCardsOverviewComponent {
   @ViewChildren('table') tables!: QueryList<ElementRef<HTMLTableElement>>;
 
-  sanctionPerPlayer = input.required<Map<string, Sanction[]>>();
+  sanctionPerPlayer = input.required<Map<number, Sanction[]>>();
   yellowCardsData = computed(() => {
     const yellowCardsData: YellowCardData[] = [];
     const today = new Date();
-    this.sanctionPerPlayer().forEach((sanctions, player) => {
-      const yellowCardData = this.buildYellowCardData(sanctions, player, today);
+    this.sanctionPerPlayer().forEach((sanctions) => {
+      const yellowCardData = this.buildYellowCardData(sanctions, today);
       if (yellowCardData.number > 0) {
         yellowCardsData.push(yellowCardData);
       }
@@ -40,9 +40,9 @@ export class YellowCardsOverviewComponent {
     4: { cellWidth: 37.84 },
   }
 
-  buildYellowCardData(sanctions: Sanction[], player: string, today: Date): YellowCardData {
+  buildYellowCardData(sanctions: Sanction[], today: Date): YellowCardData {
     const yellowCardData: YellowCardData = {
-      player: player,
+      player: sanctions[0].nomPrenomPersonne,
       subcategory: sanctions[0].libelleSousCategorie,
       endDates: [],
       number: 0,

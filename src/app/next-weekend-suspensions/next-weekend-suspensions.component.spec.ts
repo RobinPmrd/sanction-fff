@@ -1,8 +1,9 @@
 import { NextWeekendSuspensionsComponent } from './next-weekend-suspensions.component';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ComponentRef } from '@angular/core';
-import { Match, Sanction, TeamNameMatching, TeamSuspension } from '../app.model';
+import { Match, Sanction, TeamNameMatching, PlayerSuspensions, TeamRemainingSuspension } from '../app.model';
 import { setInput } from '../utils';
+import { seniorTeam1Match, seniorTeam2Match, seniorPlayer, u18Team1Match, u18Player, veteranSeniorPlayer, loisirTeam1Match, loisirPlayer, enterpriseTeam1Match, veteranEnterprisePlayer, enterprisePlayer } from '../app.component.spec';
 
 describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
   let nextWeekendSuspensionsComponent: NextWeekendSuspensionsComponent;
@@ -57,19 +58,19 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [seniorPlayer.nomPrenomPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'Sénior B', remaining: 1 }]
+    const seniorPlayersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior B', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
-      [seniorPlayer.nomPrenomPersonne], expectedTeamSuspensions);
+      [seniorPlayer.numeroPersonne], seniorPlayersSuspensions);
   });
 
   it('should be suspended for both team when 2 matches suspension ', () => {
@@ -78,19 +79,19 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [seniorPlayer.nomPrenomPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11'), libelleDecision: '2 matchs de suspension' }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11'), libelleDecision: '2 matchs de suspension' }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 2 }]
+    const seniorPlayersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 2 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
-      [seniorPlayer.nomPrenomPersonne], expectedTeamSuspensions);
+      [seniorPlayer.numeroPersonne], seniorPlayersSuspensions);
   });
 
   it('should ignore friendly matches and be suspended for both team first match when suspended from last season', () => {
@@ -99,38 +100,38 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [seniorPlayer.nomPrenomPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-05-20') }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-05-20') }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }]
+    const seniorPlayersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
-      [seniorPlayer.nomPrenomPersonne], expectedTeamSuspensions);
+      [seniorPlayer.numeroPersonne], seniorPlayersSuspensions);
   });
 
   it('should be suspended when young player ', () => {
     setInput<Match[]>(componentRef, 'matches', [
       { ...u18Team1Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [u18Player.nomPrenomPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-18') }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [u18Player.numeroPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-18') }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'U18 A', remaining: 1 }]
+    const u18PlayersSuspensions: PlayerSuspensions[] = [
+      { name: u18Player.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / U19 - U18',
-      [u18Player.nomPrenomPersonne], expectedTeamSuspensions);
+      [u18Player.numeroPersonne], u18PlayersSuspensions);
   });
 
   it('should be suspended in young category when young player suspended in senior', () => {
@@ -138,19 +139,19 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...u18Team1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [u18Player.nomPrenomPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-18'), competition: 'Régional 3' }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [u18Player.numeroPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-18'), competition: 'Régional 3' }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'U18 A', remaining: 1 }]
+    const u18PlayersSuspensions: PlayerSuspensions[] = [
+      { name: u18Player.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / U19 - U18',
-      [u18Player.nomPrenomPersonne], expectedTeamSuspensions);
+      [u18Player.numeroPersonne], u18PlayersSuspensions);
   });
 
   it('should be suspended when suspended indefinitely ', () => {
@@ -163,27 +164,27 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [u18Player.nomPrenomPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-06'), libelleDecision: 'Suspendu jusqu\'à réception de rapport et décision' }]],
-      [seniorPlayer.nomPrenomPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-06'), libelleDecision: 'Traité le 15/10/2025' }]],
-      [veteranSeniorPlayer.nomPrenomPersonne, [{ ...veteranSeniorPlayer, dateDeffet: null, libelleDecision: 'A traiter le 15/10/2025' }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [u18Player.numeroPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-06'), libelleDecision: 'Suspendu jusqu\'à réception de rapport et décision' }]],
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-06'), libelleDecision: 'Traité le 15/10/2025' }]],
+      [veteranSeniorPlayer.numeroPersonne, [{ ...veteranSeniorPlayer, dateDeffet: null, libelleDecision: 'A traiter le 15/10/2025' }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedU18TeamSuspensions = [
-      [{ name: 'U18 A', remaining: 999 }]
+    const u18PlayersSuspensions: PlayerSuspensions[] = [
+      { name: u18Player.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 999 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 2, 'Libre / U19 - U18',
-      [u18Player.nomPrenomPersonne], expectedU18TeamSuspensions);
-    const expectedSeniorTeamSuspensions = [
-      [{ name: 'Sénior A', remaining: 999 }, { name: 'Sénior B', remaining: 999 }],
-      [{ name: 'Sénior A', remaining: 999 }, { name: 'Sénior B', remaining: 999 }]
+      [u18Player.numeroPersonne], u18PlayersSuspensions);
+    const seniorPlayersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 999 }, { name: 'Sénior B', remaining: 999 }] },
+      { name: veteranSeniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 999 }, { name: 'Sénior B', remaining: 999 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 2, 'Libre / Senior',
-      [seniorPlayer.nomPrenomPersonne, veteranSeniorPlayer.nomPrenomPersonne], expectedSeniorTeamSuspensions);
+      [seniorPlayer.numeroPersonne, veteranSeniorPlayer.numeroPersonne], seniorPlayersSuspensions);
   });
 
   it('should be suspended for one match more when libelleSousCategorie contains Automatique', () => {
@@ -191,19 +192,19 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...u18Team1Match, dateDuMatch: new Date("2024-09-16") },
       { ...u18Team1Match, dateDuMatch: new Date("2024-09-23") },
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [u18Player.nomPrenomPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-06'), libelleDecision: 'Automatique + 3 Matchs De Suspension' }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [u18Player.numeroPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-06'), libelleDecision: 'Automatique + 3 Matchs De Suspension' }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'U18 A', remaining: 3 }]
+    const playersSuspensions: PlayerSuspensions[] = [
+      { name: u18Player.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 3 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / U19 - U18',
-      [u18Player.nomPrenomPersonne], expectedTeamSuspensions);
+      [u18Player.numeroPersonne], playersSuspensions);
   });
 
   it('should be suspended when match report in the future', () => {
@@ -211,19 +212,19 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-16"), dateReport: new Date("2024-12-15") },
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [seniorPlayer.nomPrenomPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'Sénior A', remaining: 1 }]
+    const playersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
-      [seniorPlayer.nomPrenomPersonne], expectedTeamSuspensions);
+      [seniorPlayer.numeroPersonne], playersSuspensions);
   });
 
   it('should not be suspended', () => {
@@ -231,8 +232,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-16") },
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [seniorPlayer.nomPrenomPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
     ]));
 
     // WHEN
@@ -246,8 +247,8 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
     setInput<Match[]>(componentRef, 'matches', [
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [seniorPlayer.nomPrenomPersonne, [
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [
         {
           ...seniorPlayer,
           dateDeffet: new Date('2024-09-18'), libelleDecision: 'Inscription Au Fichier', dateDeFin: new Date('2024-12-18'), nbreCartonsJaunes: 1, cartonRouge: 'Non'
@@ -268,19 +269,19 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-12-16"), dateReport: new Date("2024-09-16") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [seniorPlayer.nomPrenomPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'Sénior A', remaining: 1 }]
+    const seniorPlayersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
-      [seniorPlayer.nomPrenomPersonne], expectedTeamSuspensions);
+      [seniorPlayer.numeroPersonne], seniorPlayersSuspensions);
   });
 
   it('should be suspended for Team 2 when effect date in the future and no match remaining', () => {
@@ -288,38 +289,38 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-16") },
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [seniorPlayer.nomPrenomPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-25') }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-25') }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'Sénior B', remaining: 1 }]
+    const playersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior B', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
-      [seniorPlayer.nomPrenomPersonne], expectedTeamSuspensions);
+      [seniorPlayer.numeroPersonne], playersSuspensions);
   });
 
   it('should be suspended when Loisir player', () => {
     setInput<Match[]>(componentRef, 'matches', [
       { ...loisirTeam1Match, dateDuMatch: new Date("2024-09-23") }
     ]);
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [loisirPlayer.nomPrenomPersonne, [{ ...loisirPlayer, dateDeffet: new Date('2024-09-18') }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [loisirPlayer.numeroPersonne, [{ ...loisirPlayer, dateDeffet: new Date('2024-09-18') }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'Loisir A', remaining: 1 }]
+    const playersSuspensions: PlayerSuspensions[] = [
+      { name: loisirPlayer.nomPrenomPersonne, teams: [{ name: 'Loisir A', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Foot Loisir / Foot Loisir',
-      [loisirPlayer.nomPrenomPersonne], expectedTeamSuspensions);
+      [loisirPlayer.numeroPersonne], playersSuspensions);
   });
 
   it('should be suspended when Veteran player playing in Senior category', () => {
@@ -327,40 +328,40 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ]);
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [veteranSeniorPlayer.nomPrenomPersonne, [{ ...veteranSeniorPlayer, dateDeffet: new Date('2024-09-18') }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [veteranSeniorPlayer.numeroPersonne, [{ ...veteranSeniorPlayer, dateDeffet: new Date('2024-09-18') }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }]
+    const playersSuspensions: PlayerSuspensions[] = [
+      { name: veteranSeniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
-      [veteranSeniorPlayer.nomPrenomPersonne], expectedTeamSuspensions);
+      [veteranSeniorPlayer.numeroPersonne], playersSuspensions);
   });
 
   it('should be suspended when Entreprise player', () => {
     setInput<Match[]>(componentRef, 'matches', [
       { ...enterpriseTeam1Match, dateDuMatch: new Date("2024-09-23") }
     ]);
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [veteranEnterprisePlayer.nomPrenomPersonne, [{ ...veteranEnterprisePlayer, dateDeffet: new Date('2024-09-18') }]],
-      [enterprisePlayer.nomPrenomPersonne, [{ ...enterprisePlayer, dateDeffet: new Date('2024-09-21') }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [veteranEnterprisePlayer.numeroPersonne, [{ ...veteranEnterprisePlayer, dateDeffet: new Date('2024-09-18') }]],
+      [enterprisePlayer.numeroPersonne, [{ ...enterprisePlayer, dateDeffet: new Date('2024-09-21') }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'Entreprise A', remaining: 1 }],
-      [{ name: 'Entreprise A', remaining: 1 }]
+    const playersSuspensions: PlayerSuspensions[] = [
+      { name: veteranEnterprisePlayer.nomPrenomPersonne, teams: [{ name: 'Entreprise A', remaining: 1 }] },
+      { name: enterprisePlayer.nomPrenomPersonne, teams: [{ name: 'Entreprise A', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Foot Entreprise / Senior',
-      [veteranEnterprisePlayer.nomPrenomPersonne, enterprisePlayer.nomPrenomPersonne], expectedTeamSuspensions);
+      [veteranEnterprisePlayer.numeroPersonne, enterprisePlayer.numeroPersonne], playersSuspensions);
   });
 
   it('should be suspended when effect date greater than today but before week-end', () => {
@@ -368,19 +369,19 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [seniorPlayer.nomPrenomPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-22') }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-22') }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }],
+    const playersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }]}
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
-      [seniorPlayer.nomPrenomPersonne], expectedTeamSuspensions);
+      [seniorPlayer.numeroPersonne], playersSuspensions);
   });
 
   it('should be suspended when 2 players with same name', () => {
@@ -389,143 +390,39 @@ describe('NextWeekendSuspensionsComponent.sanctionAnalysis', () => {
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") },
       { ...u18Team1Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<string, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
-      [seniorPlayer.nomPrenomPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-22') }]],
-      [seniorPlayer.nomPrenomPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-22'), nomPrenomPersonne: seniorPlayer.nomPrenomPersonne }]]
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-22') }]],
+      [u18Player.numeroPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-22'), nomPrenomPersonne: seniorPlayer.nomPrenomPersonne }]]
     ]));
 
     // WHEN
     nextWeekendSuspensionsComponent.sanctionAnalysis();
 
     // THEN
-    const expectedTeamSuspensions = [
-      [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }],
-      [{ name: 'U18 A', remaining: 1 }]
+    const seniorPlayersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{name: 'Sénior A', remaining: 1}, { name: 'Sénior B', remaining: 1 }]}
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 2, 'Libre / Senior',
-      [seniorPlayer.nomPrenomPersonne, seniorPlayer.nomPrenomPersonne], expectedTeamSuspensions);
+      [seniorPlayer.numeroPersonne], seniorPlayersSuspensions);
+    const u18PlayersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 1 }]}
+    ]
+    checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 2, 'Libre / U19 - U18',
+      [u18Player.numeroPersonne], u18PlayersSuspensions);
+      
   });
 });
 
 function checkSuspendedPlayersByCategory(
-  suspendedPlayersByCategory: Map<string, Map<string, TeamSuspension[]>>, categoryWithSuspensions: number, category: string,
-  suspendedPlayers: string[], suspendedPlayerTeams: Array<TeamSuspension[]>
+  suspendedPlayersByCategory: Map<string, Map<number, PlayerSuspensions>>, categoryWithSuspensions: number, category: string,
+  suspendedPlayers: number[], playersSuspensions: Array<PlayerSuspensions>
 ) {
   expect(suspendedPlayersByCategory.size).toBe(categoryWithSuspensions);
   const categorySuspensions = suspendedPlayersByCategory.get(category);
   expect(categorySuspensions?.size).toBe(suspendedPlayers.length);
   suspendedPlayers.forEach((player, index) => {
     const playerSuspensions = categorySuspensions?.get(player);
-    const teamSuspensions = suspendedPlayerTeams[index];
-    expect(playerSuspensions).toEqual(teamSuspensions);
+    const expectedPlayerSuspensions = playersSuspensions[index];
+    expect(playerSuspensions).toEqual(expectedPlayerSuspensions);
   })
-}
-
-const seniorTeam1Match: Match = {
-  competition: "Régional 1 Intersport",
-  categorieEquipeLocale: "Libre / Senior",
-  equipeLocale: "TEAM 1",
-  dateDuMatch: new Date(),
-  dateReport: null
-};
-const seniorTeam2Match: Match = {
-  competition: "Régional 3",
-  categorieEquipeLocale: "Libre / Senior",
-  equipeLocale: "TEAM 2",
-  dateDuMatch: new Date(),
-  dateReport: null
-};
-const u18Team1Match: Match = {
-  competition: "Départemental 1 U18 Masculin",
-  categorieEquipeLocale: "Libre / U19 - U18",
-  equipeLocale: "TEAM 21",
-  dateDuMatch: new Date(),
-  dateReport: null
-};
-const loisirTeam1Match: Match = {
-  competition: "Départemental Loisirs",
-  categorieEquipeLocale: "Foot Loisir / Foot Loisir",
-  equipeLocale: "TEAM 1",
-  dateDuMatch: new Date(),
-  dateReport: null
-};
-const enterpriseTeam1Match: Match = {
-  competition: "Départemental 1 Entreprise",
-  categorieEquipeLocale: "Foot Entreprise / Senior",
-  equipeLocale: "TEAM 1",
-  dateDuMatch: new Date(),
-  dateReport: null
-}
-
-const seniorPlayer: Sanction = {
-  competition: 'Régional 1 Intersport',
-  nomPrenomPersonne: 'John Doe',
-  libelleDecision: '1 match de suspension',
-  dateDeffet: new Date(),
-  libelleMotif: null,
-  libelleSousCategorie: 'Libre / Senior',
-  dateDeFin: null,
-  nbreCartonsJaunes: 0,
-  cartonRouge: 'Oui',
-  sommeTotale: null
-};
-const u18Player: Sanction = {
-  competition: 'Départemental 1 U18 Masculin',
-  nomPrenomPersonne: 'Mickael Young',
-  libelleDecision: '1 match de suspension',
-  dateDeffet: new Date(),
-  libelleMotif: null,
-  libelleSousCategorie: 'Libre / U18 (- 18 Ans)',
-  dateDeFin: null,
-  nbreCartonsJaunes: 0,
-  cartonRouge: 'Oui',
-  sommeTotale: null
-}
-const loisirPlayer: Sanction = {
-  competition: 'Départemental Loisirs',
-  nomPrenomPersonne: 'Lindy Harding',
-  libelleDecision: '1 match de suspension',
-  dateDeffet: new Date(),
-  libelleMotif: null,
-  libelleSousCategorie: 'Foot Loisir / Foot Loisir',
-  dateDeFin: null,
-  nbreCartonsJaunes: 0,
-  cartonRouge: 'Oui',
-  sommeTotale: null
-};
-const veteranSeniorPlayer: Sanction = {
-  competition: 'Régional 1 Intersport',
-  nomPrenomPersonne: 'Alex Old',
-  libelleDecision: '1 match de suspension',
-  dateDeffet: new Date(),
-  libelleMotif: null,
-  libelleSousCategorie: 'Libre / Vétéran',
-  dateDeFin: null,
-  nbreCartonsJaunes: 0,
-  cartonRouge: 'Oui',
-  sommeTotale: null
-};
-const veteranEnterprisePlayer: Sanction = {
-  competition: 'Départemental 1 Entreprise',
-  nomPrenomPersonne: 'Noah Thorburn',
-  libelleDecision: '1 match de suspension',
-  dateDeffet: new Date(),
-  libelleMotif: null,
-  libelleSousCategorie: 'Foot Entreprise / Vétéran',
-  dateDeFin: null,
-  nbreCartonsJaunes: 0,
-  cartonRouge: 'Oui',
-  sommeTotale: null
-};
-const enterprisePlayer: Sanction = {
-  competition: 'Départemental 1 Entreprise',
-  nomPrenomPersonne: 'Kyle Christmas',
-  libelleDecision: '1 match de suspension',
-  dateDeffet: new Date(),
-  libelleMotif: null,
-  libelleSousCategorie: 'Foot Entreprise / Senior',
-  dateDeFin: null,
-  nbreCartonsJaunes: 0,
-  cartonRouge: 'Oui',
-  sommeTotale: null
 }
