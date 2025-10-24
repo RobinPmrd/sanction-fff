@@ -28,12 +28,12 @@ export class AppComponent {
   tab = signal(0);
   errors = signal<string[]>([]);
 
-  sanctionPerPlayer = computed(() => Map.groupBy(this.sanctions(), sanction => sanction.numeroPersonne));
+  sanctionsPerPlayer = computed(() => Map.groupBy(this.sanctions(), sanction => sanction.numeroPersonne));
   hasErrors = computed(() => this.sanctionsFileHasErrors() || this.matchesFileHasErrors() || this.errors().length !== 0);
   disableButton = computed(() => this.sanctions().length === 0 || this.matches().length === 0 || this.hasErrors());
 
   requiredColumns = {
-    sanction: ['Nom, prénom personne', 'Compétition', 'Date d\'effet', 'Libellé décision', 'Libellé sous catégorie'],
+    sanction: ['Nom, prénom personne', 'Numéro personne', 'Compétition', 'Date d\'effet', 'Libellé décision', 'Libellé sous catégorie'],
     match: ['Compétition', 'Catégorie équipe locale', 'Equipe locale', 'Date du match', 'Date report'],
     teamNameMatching: ['Catégorie Footclub', 'Nom équipe Footclub', 'Nom équipe interne']
   }

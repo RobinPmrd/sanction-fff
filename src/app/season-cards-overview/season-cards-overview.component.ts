@@ -59,10 +59,10 @@ export class SeasonCardsOverviewComponent {
     right: 8
   }
 
-  sanctionPerPlayer = input.required<Map<number, Sanction[]>>();
+  sanctionsPerPlayer = input.required<Map<number, Sanction[]>>();
   cardsHistoric = computed(() => {
     const cardsHistoric: CardHistoric[] = [];
-    this.sanctionPerPlayer().forEach((sanctions) => {
+    this.sanctionsPerPlayer().forEach((sanctions) => {
       const cardHistoric = this.buildCardHistoric(sanctions);
       cardsHistoric.push(cardHistoric);
     })

@@ -23,7 +23,7 @@ describe('SeasonCardsOverviewComponent', () => {
   });
 
   it('should create', () => {
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
     ]));
     expect(component).toBeTruthy();

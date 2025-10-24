@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { generatePdf } from '../utils';
 import moment from 'moment';
 
-interface YellowCardData {
+export interface YellowCardData {
   player: string,
   number: number,
   endDates: Date[],
@@ -21,11 +21,11 @@ interface YellowCardData {
 export class YellowCardsOverviewComponent {
   @ViewChildren('table') tables!: QueryList<ElementRef<HTMLTableElement>>;
 
-  sanctionPerPlayer = input.required<Map<number, Sanction[]>>();
+  sanctionsPerPlayer = input.required<Map<number, Sanction[]>>();
   yellowCardsData = computed(() => {
     const yellowCardsData: YellowCardData[] = [];
     const today = new Date();
-    this.sanctionPerPlayer().forEach((sanctions) => {
+    this.sanctionsPerPlayer().forEach((sanctions) => {
       const yellowCardData = this.buildYellowCardData(sanctions, today);
       if (yellowCardData.number > 0) {
         yellowCardsData.push(yellowCardData);
@@ -48,10 +48,12 @@ export class YellowCardsOverviewComponent {
       number: 0,
     }
     sanctions.forEach(sanction => {
-      const yellowCards = this.isYellowCardInPeriod(sanction, today);
-      if (yellowCards) {
+      if (this.isYellowCardInPeriod(sanction, today) && yellowCardData.number < 2) {
         yellowCardData.endDates.push(sanction.dateDeFin!);
         yellowCardData.number++;
+      } else {
+        yellowCardData.endDates = [];
+        yellowCardData.number = 0;
       }
     });
     return yellowCardData;

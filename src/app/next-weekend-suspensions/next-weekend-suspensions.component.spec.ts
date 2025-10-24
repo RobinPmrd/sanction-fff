@@ -70,7 +70,7 @@ describe('Sanction analysis tests', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
     ]));
 
@@ -91,7 +91,7 @@ describe('Sanction analysis tests', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11'), libelleDecision: '2 matchs de suspension' }]]
     ]));
 
@@ -112,7 +112,7 @@ describe('Sanction analysis tests', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-05-20') }]]
     ]));
 
@@ -131,7 +131,7 @@ describe('Sanction analysis tests', () => {
     setInput<Match[]>(componentRef, 'matches', [
       { ...u18Team1Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [u18Player.numeroPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-18') }]]
     ]));
 
@@ -151,7 +151,7 @@ describe('Sanction analysis tests', () => {
       { ...u18Team1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [u18Player.numeroPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-18'), competition: 'Régional 3' }]]
     ]));
 
@@ -176,7 +176,7 @@ describe('Sanction analysis tests', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [u18Player.numeroPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-06'), libelleDecision: 'Suspendu jusqu\'à réception de rapport et décision' }]],
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-06'), libelleDecision: 'Traité le 15/10/2025' }]],
       [veteranSeniorPlayer.numeroPersonne, [{ ...veteranSeniorPlayer, dateDeffet: null, libelleDecision: 'A traiter le 15/10/2025' }]]
@@ -204,7 +204,7 @@ describe('Sanction analysis tests', () => {
       { ...u18Team1Match, dateDuMatch: new Date("2024-09-16") },
       { ...u18Team1Match, dateDuMatch: new Date("2024-09-23") },
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [u18Player.numeroPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-06'), libelleDecision: 'Automatique + 3 Matchs De Suspension' }]]
     ]));
 
@@ -224,7 +224,7 @@ describe('Sanction analysis tests', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-16"), dateReport: new Date("2024-12-15") },
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
     ]));
 
@@ -244,7 +244,7 @@ describe('Sanction analysis tests', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-16") },
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
     ]));
 
@@ -259,7 +259,7 @@ describe('Sanction analysis tests', () => {
     setInput<Match[]>(componentRef, 'matches', [
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [
         {
           ...seniorPlayer,
@@ -281,7 +281,7 @@ describe('Sanction analysis tests', () => {
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-12-16"), dateReport: new Date("2024-09-16") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-11') }]]
     ]));
 
@@ -301,7 +301,7 @@ describe('Sanction analysis tests', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-16") },
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-25') }]]
     ]));
 
@@ -320,7 +320,7 @@ describe('Sanction analysis tests', () => {
     setInput<Match[]>(componentRef, 'matches', [
       { ...loisirTeam1Match, dateDuMatch: new Date("2024-09-23") }
     ]);
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [loisirPlayer.numeroPersonne, [{ ...loisirPlayer, dateDeffet: new Date('2024-09-18') }]]
     ]));
 
@@ -340,7 +340,7 @@ describe('Sanction analysis tests', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ]);
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [veteranSeniorPlayer.numeroPersonne, [{ ...veteranSeniorPlayer, dateDeffet: new Date('2024-09-18') }]]
     ]));
 
@@ -359,7 +359,7 @@ describe('Sanction analysis tests', () => {
     setInput<Match[]>(componentRef, 'matches', [
       { ...enterpriseTeam1Match, dateDuMatch: new Date("2024-09-23") }
     ]);
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [veteranEnterprisePlayer.numeroPersonne, [{ ...veteranEnterprisePlayer, dateDeffet: new Date('2024-09-18') }]],
       [enterprisePlayer.numeroPersonne, [{ ...enterprisePlayer, dateDeffet: new Date('2024-09-21') }]]
     ]));
@@ -381,7 +381,7 @@ describe('Sanction analysis tests', () => {
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-22') }]]
     ]));
 
@@ -402,7 +402,7 @@ describe('Sanction analysis tests', () => {
       { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") },
       { ...u18Team1Match, dateDuMatch: new Date("2024-09-23") }
     ])
-    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionPerPlayer', new Map([
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
       [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-22') }]],
       [u18Player.numeroPersonne, [{ ...u18Player, dateDeffet: new Date('2024-09-22'), nomPrenomPersonne: seniorPlayer.nomPrenomPersonne }]]
     ]));

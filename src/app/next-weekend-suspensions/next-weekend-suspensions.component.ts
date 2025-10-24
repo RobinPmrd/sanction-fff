@@ -17,7 +17,7 @@ import { RemainingMatchesPipe } from '../pipe/remaining-matches.pipe';
 export class NextWeekendSuspensionsComponent {
   @ViewChildren('table') tables!: QueryList<ElementRef<HTMLTableElement>>;
 
-  sanctionPerPlayer = input.required<Map<number, Sanction[]>>();
+  sanctionsPerPlayer = input.required<Map<number, Sanction[]>>();
   matches = input.required<Match[]>();
   teamNameMatchings = input<TeamNameMatching[]>([]);
   process = input(false);
@@ -64,7 +64,7 @@ export class NextWeekendSuspensionsComponent {
     const today = new Date()
     today.setHours(0, 0, 0, 0);
     const suspendedPlayersByCategory = new Map<string, Map<number, PlayerSuspensions>>();
-    this.sanctionPerPlayer().forEach((sanction, player) => {
+    this.sanctionsPerPlayer().forEach((sanction, player) => {
       const lastSanction = sanction[sanction.length - 1];
       const lastNbMatchesSuspension = this.extractSuspensionMatches(lastSanction);
       if (lastNbMatchesSuspension !== 0) {
