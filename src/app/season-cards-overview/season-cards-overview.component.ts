@@ -1,9 +1,10 @@
 import { Component, computed, ElementRef, input, QueryList, signal, ViewChildren } from '@angular/core';
-import { Sanction } from '../app.model';
+import { PdfOptions, Sanction } from '../app.model';
 import { NgClass } from '@angular/common';
-import { CellHookData, MarginPaddingInput } from 'jspdf-autotable'
-import { generatePdf } from '../utils';
+import { CellHookData } from 'jspdf-autotable'
 import moment from 'moment/moment';
+import { ExportButtonComponent } from '../export-button/export-button.component';
+import { CellObject, CellStyle } from 'xlsx-js-style';
 
 interface CardHistoric {
   player: string,
@@ -31,7 +32,8 @@ type CardHistoricKey = keyof CardHistoric;
 @Component({
   selector: 'season-cards-overview',
   imports: [
-    NgClass
+    NgClass,
+    ExportButtonComponent
   ],
   templateUrl: './season-cards-overview.component.html',
 })
@@ -43,20 +45,23 @@ export class SeasonCardsOverviewComponent {
     { label: 'Carton blancs', key: 'whiteCards' }, { label: 'Total cartons', key: 'totalCards' }, { label: 'Motifs', key: 'reasons' }, { label: 'Amende totale', key: 'totalCost' }
   ]
   initialSorting: CardHistoricKey[] = ['totalCost', 'totalCards', 'redCards', 'yellowCards', 'whiteCards', 'player', 'subcategory'];
-  pdfTitle = `Palmarès des cartons au ${moment().format('DD/MM/YYYY')}`;
-  columnStyles = {
-    0: { cellWidth: 9.35 },
-    1: { cellWidth: 32.25 },
-    3: { cellWidth: 14.87 },
-    4: { cellWidth: 14.90 },
-    5: { cellWidth: 14.87 },
-    6: { cellWidth: 16.1925 },
-    7: { cellWidth: 40 },
-    8: { cellWidth: 21.52 },
-  }
-  margin: MarginPaddingInput = {
-    left: 8,
-    right: 8
+  pdfOptions: PdfOptions = {
+    title: `Palmarès des cartons au ${moment().format('DD/MM/YYYY')}`,
+    didParseCell: this.formatCell,
+    columnStyles: {
+      0: { cellWidth: 9.35 },
+      1: { cellWidth: 32.25 },
+      3: { cellWidth: 14.87 },
+      4: { cellWidth: 14.90 },
+      5: { cellWidth: 14.87 },
+      6: { cellWidth: 16.1925 },
+      7: { cellWidth: 40 },
+      8: { cellWidth: 21.52 },
+    },
+    margin: {
+      left: 8,
+      right: 8
+    }
   }
 
   sanctionsPerPlayer = input.required<Map<number, Sanction[]>>();
@@ -67,18 +72,51 @@ export class SeasonCardsOverviewComponent {
       cardsHistoric.push(cardHistoric);
     })
     cardsHistoric.sort((a, b) => this.sortRaw(a, b));
+    cardsHistoric.push()
     return cardsHistoric;
   });
-  totals = computed(() => {
+  totals = computed<CardHistoric>(() => {
     const data = this.cardsHistoric();
     return {
+      player: 'Totaux',
+      subcategory: '',
       yellowCards: data.reduce((sum, r) => sum + (r.yellowCards || 0), 0),
       redCards: data.reduce((sum, r) => sum + (r.redCards || 0), 0),
       whiteCards: data.reduce((sum, r) => sum + (r.whiteCards || 0), 0),
       totalCards: data.reduce((sum, r) => sum + (r.totalCards || 0), 0),
+      reasons: [],
       totalCost: data.reduce((sum, r) => sum + (r.totalCost || 0), 0)
     };
   })
+  cardsHistoricForExcel = computed<Record<string, string | number | CellObject>[]>(() => {
+      const cardsHistoricForExcel: Record<string, string | number | CellObject>[] = this.cardsHistoric().map(cardHistoric =>
+        ({
+          ...cardHistoric,
+          reasons: {
+            t: 's',
+            v: cardHistoric.reasons.map(reason => `${reason.label} (x${reason.number})`).join(' \n')
+          }
+        }));
+
+      const totalRawStyle: CellStyle = {
+        fill: { fgColor: { rgb: '1c398e' } },
+        font: { bold: true, color: { rgb: 'ffffff' } }
+      };
+      const totalRaw: Record<string, CellObject> = {
+        player: { t: 's', v: this.totals().player, s: totalRawStyle },
+        subcategory: { t: 's', v: this.totals().subcategory, s: totalRawStyle },
+        yellowCards: { t: 'n', v: this.totals().yellowCards, s: totalRawStyle },
+        redCards: { t: 'n', v: this.totals().redCards, s: totalRawStyle },
+        whiteCards: { t: 'n', v: this.totals().whiteCards, s: totalRawStyle },
+        totalCards: { t: 'n', v: this.totals().totalCards, s: totalRawStyle },
+        reasons: { t: 's', v: '', s: totalRawStyle },
+        totalCost: { t: 'n', v: this.totals().totalCost, s: totalRawStyle },
+      }
+      cardsHistoricForExcel.push(totalRaw);
+      return cardsHistoricForExcel;
+    }
+  )
+
   currentSorting = signal(this.initialSorting);
   sortDirection = signal<'asc' | 'desc'>('desc');
   sortColumn = signal<CardHistoricKey>('totalCost');
@@ -157,6 +195,4 @@ export class SeasonCardsOverviewComponent {
       .replace('🥈', '2')
       .replace('🥉', '3'));
   }
-
-  protected readonly generatePdf = generatePdf;
 }

@@ -1,8 +1,9 @@
 import { Component, computed, ElementRef, input, QueryList, ViewChildren } from '@angular/core';
-import { Sanction } from '../app.model';
+import { PdfOptions, Sanction } from '../app.model';
 import { DatePipe } from '@angular/common';
-import { generatePdf } from '../utils';
 import moment from 'moment';
+import { ExportButtonComponent } from '../export-button/export-button.component';
+import { CellObject } from 'xlsx-js-style';
 
 export interface YellowCardData {
   player: string,
@@ -14,7 +15,8 @@ export interface YellowCardData {
 @Component({
   selector: 'yellow-cards-overview',
   imports: [
-    DatePipe
+    DatePipe,
+    ExportButtonComponent
   ],
   templateUrl: './yellow-cards-overview.component.html',
 })
@@ -34,10 +36,34 @@ export class YellowCardsOverviewComponent {
     yellowCardsData.sort((a, b) => this.sortByYellowCardAndEndDate(a, b));
     return yellowCardsData;
   });
+  yellowCardsDataForExcel = computed(() => {
+    return this.yellowCardsData().map(yellowCardData => {
+      const row: Record<string, string | CellObject> = {};
+      row['player'] = yellowCardData.player;
+      row['subcategory'] = yellowCardData.subcategory;
+      row['nbYellowCards'] = {
+        t: 'n',
+        v: yellowCardData.number
+      }
+      row['firstEndDate'] = {
+        t: 'd',
+        v: yellowCardData.endDates[0]
+      };
+      if (yellowCardData.number == 2) {
+        row['secondEndDate'] = {
+          t: 'd',
+          v: yellowCardData.endDates[1]
+        };
+      }
+      return row;
+    });
+  });
 
-  pdfTitle = `Cartons jaunes actifs au ${moment().format('DD/MM/YYYY')}`;
-  columnStyles = {
-    4: { cellWidth: 37.84 },
+  pdfOptions: PdfOptions = {
+    title: `Cartons jaunes actifs au ${moment().format('DD/MM/YYYY')}`,
+    columnStyles: {
+      4: { cellWidth: 37.84 },
+    }
   }
 
   buildYellowCardData(sanctions: Sanction[], today: Date): YellowCardData {
@@ -72,6 +98,4 @@ export class YellowCardsOverviewComponent {
     }
     return a.number > b.number ? -1 : 1;
   }
-
-  protected readonly generatePdf = generatePdf;
 }

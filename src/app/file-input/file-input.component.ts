@@ -1,5 +1,5 @@
 import { Component, input, model, signal } from '@angular/core';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import { parseValue, toCamelCase } from '../utils';
 
 @Component({
@@ -20,10 +20,10 @@ export class FileInputComponent<T> {
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
       if (e.target) {
-        const workbook = XLSX.read(e.target.result, {type: 'binary'});
+        const workbook = XLSX.read(e.target.result, { type: 'binary' });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
-        const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, {raw: true, defval: null});
+        const rawData: any[] = XLSX.utils.sheet_to_json(worksheet, { raw: true, defval: null });
         const columns = Object.keys(rawData[0]);
         const data: T[] = rawData.map(row => this.formatData(row));
         this.data.set(data);

@@ -89,11 +89,12 @@
     </table>
   </div>
   <div>
-    <button
-      class="bg-blue-900 hover:bg-blue-950 hover:cursor-pointer text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-      (click)="generatePdf(tables, 'palmares-cartons', pdfTitle, formatCell, columnStyles, margin)"
-    >
-      Exporter
-    </button>
+    <export-button
+      [excelData]="cardsHistoricForExcel()"
+      [excelColumnNames]="['Nom', 'Sous-catégorie', 'Carton jaunes', 'Carton rouges', 'Carton blancs', 'Total cartons', 'Motifs', 'Amende totale (€)']"
+      [pdfTable]="tables"
+      [pdfOptions]="pdfOptions"
+      fileName="palmares-cartons"
+    ></export-button>
   </div>
 </div>

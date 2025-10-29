@@ -1,3 +1,5 @@
+import { CellHook, MarginPaddingInput, Styles } from 'jspdf-autotable';
+
 export interface Sanction {
   competition: string,
   numeroPersonne: number,
@@ -34,4 +36,11 @@ export interface TeamNameMatching {
   categorieFootclub: string
   nomEquipeFootclub: string
   nomEquipeInterne: string
+}
+
+export interface PdfOptions {
+  title?: string,
+  didParseCell?: CellHook,
+  columnStyles?: { [p: string]: Partial<Styles> },
+  margin?: MarginPaddingInput
 }

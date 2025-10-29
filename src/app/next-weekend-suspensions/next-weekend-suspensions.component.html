@@ -46,14 +46,12 @@
         }
       }
     </div>
-    <div>
-      <button
-        class="bg-blue-900 hover:bg-blue-950 hover:cursor-pointer text-white font-medium px-5 py-2 rounded-lg shadow-md disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-        (click)="generatePdf(tables, 'suspensions', pdfTitle)"
-      >
-        Exporter
-      </button>
-    </div>
+    <export-button
+      [excelData]="suspensionsByCategoryForExcel()"
+      [pdfTable]="tables"
+      [pdfOptions]="pdfOptions"
+      fileName="suspensions"
+    ></export-button>
   </div>
 } @else if (hasProcess() && process()) {
   <div class="flex flex-col items-center">

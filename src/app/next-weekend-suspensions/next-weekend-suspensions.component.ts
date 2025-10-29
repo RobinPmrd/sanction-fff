@@ -1,16 +1,18 @@
 import { Component, computed, effect, ElementRef, input, QueryList, signal, ViewChildren } from '@angular/core';
 import { KeyValuePipe, NgClass } from '@angular/common';
-import { Match, Sanction, TeamNameMatching, PlayerSuspensions, TeamRemainingSuspension } from '../app.model';
-import { generatePdf } from '../utils';
+import { Match, PdfOptions, PlayerSuspensions, Sanction, TeamNameMatching, TeamRemainingSuspension } from '../app.model';
 import moment from 'moment/moment';
 import { RemainingMatchesPipe } from '../pipe/remaining-matches.pipe';
+import { ExportButtonComponent } from '../export-button/export-button.component';
+import { CellObject, CellStyle } from 'xlsx-js-style';
 
 @Component({
   selector: 'next-weekend-suspensions',
   imports: [
     KeyValuePipe,
     NgClass,
-    RemainingMatchesPipe
+    RemainingMatchesPipe,
+    ExportButtonComponent
   ],
   templateUrl: './next-weekend-suspensions.component.html',
 })
@@ -37,8 +39,57 @@ export class NextWeekendSuspensionsComponent {
 
   suspendedPlayersByCategory = signal(new Map<string, Map<number, PlayerSuspensions>>);
   displayResult = computed(() => this.hasProcess() && this.suspendedPlayersByCategory().size !== 0);
+  suspensionsByCategoryForExcel = computed(() => {
+    const allTeams: Set<string> = new Set();
+    this.suspendedPlayersByCategory().forEach(categorySuspendedPlayers => {
+      categorySuspendedPlayers.forEach(playerSuspensions => {
+        playerSuspensions.teams.forEach(team => {
+          allTeams.add(team.name);
+        });
+      });
+    });
+    const sortedTeams = Array.from(allTeams).sort((a, b) => this.sortTeams(a, b));
 
-  pdfTitle!: string;
+    const rows: Record<string, string | CellObject>[] = [];
+    this.suspendedPlayersByCategory().forEach(categorySuspendedPlayers => {
+      categorySuspendedPlayers.forEach(playerSuspensions => {
+        let row: Record<string, string | CellObject> = {};
+        row['Joueur'] = playerSuspensions.name;
+        sortedTeams.forEach(teamName => {
+          const value = playerSuspensions.teams.find(t => t.name === teamName)?.remaining;
+          const isInfinite = value === 999;
+          const cellValue = isInfinite ? '∞' : value ?? '';
+          row[teamName] = {
+            t: 's',
+            v: cellValue,
+            s: {
+              font: isInfinite ? { sz: 14 } : undefined
+            } as CellStyle
+          };
+        });
+        rows.push(row);
+      });
+    });
+    return rows;
+  });
+
+  sortTeams(a: string, b: string): number {
+    const uRegex = /^U(\d+)/i;
+    const aMatch = a.match(uRegex);
+    const bMatch = b.match(uRegex);
+
+    if (aMatch && bMatch) {
+      const aNum = parseInt(aMatch[1], 10);
+      const bNum = parseInt(bMatch[1], 10);
+      if (aNum !== bNum) {
+        return bNum - aNum;
+      }
+      return a.localeCompare(b);
+    }
+    return a.localeCompare(b);
+  }
+
+  pdfOptions!: PdfOptions;
 
   constructor() {
     const today = moment();
@@ -48,7 +99,9 @@ export class NextWeekendSuspensionsComponent {
     const saturdayDate = nextSaturday.format('DD/MM/YYYY');
     const nextSunday = nextSaturday.add(1, 'day');
     const sundayDate = nextSunday.format('DD/MM/YYYY');
-    this.pdfTitle = `Joueurs suspendus – Week-end du ${saturdayDate} au ${sundayDate}`;
+    this.pdfOptions = {
+      title: `Joueurs suspendus – Week-end du ${saturdayDate} au ${sundayDate}`
+    };
 
     effect(() => {
       if (this.process()) {
@@ -189,6 +242,4 @@ export class NextWeekendSuspensionsComponent {
     }
     return true;
   }
-
-  protected readonly generatePdf = generatePdf;
 }
