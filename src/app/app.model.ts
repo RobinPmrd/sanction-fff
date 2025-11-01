@@ -11,7 +11,8 @@ export interface Sanction {
   libelleSousCategorie: string,
   nbreCartonsJaunes: number | null,
   cartonRouge: 'Oui' | 'Non'
-  sommeTotale: number | null
+  sommeTotale: number | null,
+  numeroDossier: number
 }
 
 export interface Match {

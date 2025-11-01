@@ -28,7 +28,26 @@ describe('AppComponent', () => {
     const analysisErrors = appComponent.errors();
     expect(analysisErrors?.length).toBe(1);
     expect(appComponent.launchTreatment()).toBeFalsy();
-  })
+  });
+
+  it('should remove suspended indefinitely duplicate case number', () => {
+    appComponent.matches.set([
+      { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-07") }
+    ]);
+    appComponent.sanctions.set([
+      { ...seniorPlayer, dateDeffet: new Date('2023-05-18') },
+      { ...seniorPlayer, dateDeffet: new Date('2023-05-25'), sommeTotale: null }
+    ]);
+
+    fixture.detectChanges();
+
+    // THEN
+    const seniorPlayerSuspensions = appComponent.sanctionsPerPlayer().get(seniorPlayer.numeroPersonne);
+    expect(seniorPlayerSuspensions).toBeDefined();
+    expect(seniorPlayerSuspensions!.length).toEqual(1);
+    const expectedSanctionKept = appComponent.sanctions()[0];
+    expect(seniorPlayerSuspensions![0]).toEqual(expectedSanctionKept);
+  });
 })
 
 export const seniorTeam1Match: Match = {
@@ -78,7 +97,8 @@ export const seniorPlayer: Sanction = {
   dateDeFin: null,
   nbreCartonsJaunes: 0,
   cartonRouge: 'Oui',
-  sommeTotale: null
+  sommeTotale: 50,
+  numeroDossier: 1
 };
 export const u18Player: Sanction = {
   competition: 'Départemental 1 U18 Masculin',
@@ -91,7 +111,8 @@ export const u18Player: Sanction = {
   dateDeFin: null,
   nbreCartonsJaunes: 0,
   cartonRouge: 'Oui',
-  sommeTotale: null
+  sommeTotale: 50,
+  numeroDossier: 2
 }
 export const loisirPlayer: Sanction = {
   competition: 'Départemental Loisirs',
@@ -104,7 +125,8 @@ export const loisirPlayer: Sanction = {
   dateDeFin: null,
   nbreCartonsJaunes: 0,
   cartonRouge: 'Oui',
-  sommeTotale: null
+  sommeTotale: 50,
+  numeroDossier: 3
 };
 export const veteranSeniorPlayer: Sanction = {
   competition: 'Régional 1 Intersport',
@@ -117,7 +139,8 @@ export const veteranSeniorPlayer: Sanction = {
   dateDeFin: null,
   nbreCartonsJaunes: 0,
   cartonRouge: 'Oui',
-  sommeTotale: null
+  sommeTotale: 50,
+  numeroDossier: 4
 };
 export const veteranEnterprisePlayer: Sanction = {
   competition: 'Départemental 1 Entreprise',
@@ -130,7 +153,8 @@ export const veteranEnterprisePlayer: Sanction = {
   dateDeFin: null,
   nbreCartonsJaunes: 0,
   cartonRouge: 'Oui',
-  sommeTotale: null
+  sommeTotale: 50,
+  numeroDossier: 5
 };
 export const enterprisePlayer: Sanction = {
   competition: 'Départemental 1 Entreprise',
@@ -143,5 +167,6 @@ export const enterprisePlayer: Sanction = {
   dateDeFin: null,
   nbreCartonsJaunes: 0,
   cartonRouge: 'Oui',
-  sommeTotale: null
+  sommeTotale: 50,
+  numeroDossier: 6
 }

@@ -115,7 +115,28 @@ export class SeasonCardsOverviewComponent {
       cardsHistoricForExcel.push(totalRaw);
       return cardsHistoricForExcel;
     }
-  )
+  );
+  cardsHistoricPerSubcategory = computed(() => {
+    const subcategories = new Set(this.cardsHistoric().map(cardHistoric => cardHistoric.subcategory));
+    const result: any[] = [];
+    subcategories.forEach(subcategory => {
+      const cardsHistoricForSubcategory = this.cardsHistoric().filter(cardHistoric => cardHistoric.subcategory === subcategory);
+      const summary = cardsHistoricForSubcategory.reduce(
+        (acc, card) => ({
+          subcategory,
+          totalYellowCards: acc.totalYellowCards + card.yellowCards,
+          totalRedCards: acc.totalRedCards + card.redCards,
+        }),
+        {
+          subcategory,
+          totalYellowCards: 0,
+          totalRedCards: 0,
+        }
+      );
+      result.push(summary);
+    });
+    return result;
+  })
 
   currentSorting = signal(this.initialSorting);
   sortDirection = signal<'asc' | 'desc'>('desc');
