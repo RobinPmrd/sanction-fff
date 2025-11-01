@@ -73,7 +73,7 @@ export class NextWeekendSuspensionsComponent {
     return rows;
   });
 
-  sortTeams(a: string, b: string): number {
+  sortTeams(a: string, b: string, categoryOrder: 'asc' | 'desc' = 'asc'): number {
     const uRegex = /^U(\d+)/i;
     const aMatch = a.match(uRegex);
     const bMatch = b.match(uRegex);
@@ -86,7 +86,7 @@ export class NextWeekendSuspensionsComponent {
       }
       return a.localeCompare(b);
     }
-    return a.localeCompare(b);
+    return categoryOrder === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
   }
 
   pdfOptions!: PdfOptions;
@@ -168,7 +168,7 @@ export class NextWeekendSuspensionsComponent {
         }
       }
     });
-    return teamSuspensions.sort((a, b) => a.name.localeCompare(b.name));
+    return teamSuspensions.sort((a, b) => this.sortTeams(a.name, b.name, 'desc'));
   }
 
   isMatchCountable(match: Match, sanctionStartDate: Date, today: Date) {
@@ -227,19 +227,20 @@ export class NextWeekendSuspensionsComponent {
   }
 
   isPlayerTeam(subcategory: string, match: Match) {
-    if (!match.categorieEquipeLocale.includes(subcategory)) {
-      return false;
-    }
     if (subcategory === 'Entreprise' || subcategory === 'Libre / Senior') {
+      return match.categorieEquipeLocale.includes(subcategory);
+    }
+    const categoryNumberMatches = [...match.categorieEquipeLocale.matchAll(/u\s*(\d{1,2})/gi)].map(m => m[1]);
+    const subcategoryNumberMatch = subcategory.match(/u\s*(\d{1,2})/i);
+    if (categoryNumberMatches && subcategoryNumberMatch && categoryNumberMatches.length > 1 && categoryNumberMatches[1] === subcategoryNumberMatch[1]) {
       return true;
     }
-    const subcategoryNumberMatch = subcategory.match(/u\s*(\d{1,2})/i);
-    const competitionSubcategoryNumberMatch = match.competition.match(/u\s*(\d{1,2})/i);
+    const competitionSubcategoryNumberMatch = match.categorieEquipeLocale === 'Libre / Senior' ? ['U20', '20'] : match.competition.match(/u\s*(\d{1,2})/i);
     if (subcategoryNumberMatch && competitionSubcategoryNumberMatch) {
       const subcategoryNumber = Number.parseInt(subcategoryNumberMatch[1]);
       const competitionSubcategoryNumber = Number.parseInt(competitionSubcategoryNumberMatch[1]);
-      return subcategoryNumber <= competitionSubcategoryNumber;
+      return subcategoryNumber <= competitionSubcategoryNumber && competitionSubcategoryNumber - subcategoryNumber <= 2;
     }
-    return true;
+    return !subcategoryNumberMatch;
   }
 }

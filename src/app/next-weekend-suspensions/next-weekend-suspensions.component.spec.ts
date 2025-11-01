@@ -17,7 +17,7 @@ import {
   veteranSeniorPlayer
 } from '../app.component.spec';
 
-describe('Sanction analysis tests', () => {
+describe('sanctionAnalysis() Tests', () => {
   let nextWeekendSuspensionsComponent: NextWeekendSuspensionsComponent;
   const fixedToday = new Date('2024-09-21');
   let fixture: ComponentFixture<NextWeekendSuspensionsComponent>;
@@ -160,7 +160,7 @@ describe('Sanction analysis tests', () => {
 
     // THEN
     const u18PlayersSuspensions: PlayerSuspensions[] = [
-      { name: u18Player.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 1 }] }
+      { name: u18Player.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / U19 - U18',
       [u18Player.numeroPersonne], u18PlayersSuspensions);
@@ -187,7 +187,7 @@ describe('Sanction analysis tests', () => {
 
     // THEN
     const u18PlayersSuspensions: PlayerSuspensions[] = [
-      { name: u18Player.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 999 }] }
+      { name: u18Player.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 999 }, { name: 'Sénior A', remaining: 999 }, { name: 'Sénior B', remaining: 999 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 2, 'Libre / U19 - U18',
       [u18Player.numeroPersonne], u18PlayersSuspensions);
@@ -417,13 +417,59 @@ describe('Sanction analysis tests', () => {
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 2, 'Libre / Senior',
       [seniorPlayer.numeroPersonne], seniorPlayersSuspensions);
     const u18PlayersSuspensions: PlayerSuspensions[] = [
-      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 1 }] }
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'U18 A', remaining: 1 }, { name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }] }
     ]
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 2, 'Libre / U19 - U18',
       [u18Player.numeroPersonne], u18PlayersSuspensions);
 
   });
 });
+
+describe("isPlayerTeam() Tests", () => {
+  let nextWeekendSuspensionsComponent: NextWeekendSuspensionsComponent;
+  beforeAll(() => {
+    TestBed.configureTestingModule({
+      imports: [NextWeekendSuspensionsComponent]
+    });
+    const fixture = TestBed.createComponent(NextWeekendSuspensionsComponent);
+    nextWeekendSuspensionsComponent = fixture.componentInstance;
+  })
+
+  it('should be player\'s team when senior player and senior match', () => {
+    expect(nextWeekendSuspensionsComponent.isPlayerTeam('Libre / Senior', seniorTeam1Match)).toBe(true);
+  });
+
+  it('should be player\'s team when U18 player and U18 match', () => {
+    expect(nextWeekendSuspensionsComponent.isPlayerTeam('U18', u18Team1Match)).toBe(true);
+  });
+
+  it('should be player\'s team when U19 player and U19 match', () => {
+    const match: Match = { ...u18Team1Match, competition: 'Régional 2 U19' };
+    expect(nextWeekendSuspensionsComponent.isPlayerTeam('U19', match)).toBe(true);
+  });
+
+  it('should be player\'s team when U17 player and U18 match', () => {
+    expect(nextWeekendSuspensionsComponent.isPlayerTeam('U17', u18Team1Match)).toBe(true);
+  });
+
+  it('should be player\'s team when U19 player and senior match', () => {
+    expect(nextWeekendSuspensionsComponent.isPlayerTeam('U19', seniorTeam1Match)).toBe(true);
+  });
+
+  it('should not be player\'s team when U19 player and Gambardella match', () => {
+    const match: Match = { ...u18Team1Match, competition: 'Coupe Gambardella Crédit Agricole / Régionale' };
+    expect(nextWeekendSuspensionsComponent.isPlayerTeam('U19', match)).toBe(false);
+  });
+
+  it('should not be player\'s team when U15 player and U18 match', () => {
+    expect(nextWeekendSuspensionsComponent.isPlayerTeam('U15', u18Team1Match)).toBe(false);
+  });
+
+  it('should be player\'s team when U18 player and Gambardella match', () => {
+    const match: Match = { ...u18Team1Match, competition: 'Coupe Gambardella Crédit Agricole / Régionale' };
+    expect(nextWeekendSuspensionsComponent.isPlayerTeam('U18', match)).toBe(true);
+  });
+})
 
 function checkSuspendedPlayersByCategory(
   suspendedPlayersByCategory: Map<string, Map<number, PlayerSuspensions>>, categoryWithSuspensions: number, category: string,

@@ -9,7 +9,7 @@
       <div class="flex flex-col gap-5">
         <file-input
           label="Fichier sanctions Footclubs"
-          additionalInformations="colonnes requises : 'Nom, prénom personne', Numéro personne, Compétition, Date d'effet, Libellé décision, Libellé sous catégorie"
+          additionalInformations="colonnes requises : 'Nom, prénom personne', Numéro personne, Compétition, Date d'effet, Libellé décision, Libellé sous catégorie, Numéro dossier"
           [(data)]="sanctions"
           [requiredColumns]="requiredColumns.sanction"
           [(hasErrors)]="sanctionsFileHasErrors"

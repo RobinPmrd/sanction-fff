@@ -28,12 +28,15 @@ export class AppComponent {
   tab = signal(0);
   errors = signal<string[]>([]);
 
-  sanctionsPerPlayer = computed(() => Map.groupBy(this.sanctions(), sanction => sanction.numeroPersonne));
+  sanctionsPerPlayer = computed(() => {
+    const uniqueSanctionsByCaseNumber = this.removeDuplicateCaseNumber(this.sanctions());
+    return Map.groupBy(uniqueSanctionsByCaseNumber, sanction => sanction.numeroPersonne)
+  });
   hasErrors = computed(() => this.sanctionsFileHasErrors() || this.matchesFileHasErrors() || this.errors().length !== 0);
   disableButton = computed(() => this.sanctions().length === 0 || this.matches().length === 0 || this.hasErrors());
 
   requiredColumns = {
-    sanction: ['Nom, prénom personne', 'Numéro personne', 'Compétition', 'Date d\'effet', 'Libellé décision', 'Libellé sous catégorie'],
+    sanction: ['Nom, prénom personne', 'Numéro personne', 'Compétition', 'Date d\'effet', 'Libellé décision', 'Libellé sous catégorie', 'Numéro dossier'],
     match: ['Compétition', 'Catégorie équipe locale', 'Equipe locale', 'Date du match', 'Date report'],
     teamNameMatching: ['Catégorie Footclub', 'Nom équipe Footclub', 'Nom équipe interne']
   }
@@ -49,6 +52,20 @@ export class AppComponent {
         }
       }
     })
+  }
+
+  removeDuplicateCaseNumber(sanctions: Sanction[]) {
+    const uniqueSanctionsByCaseNumber = new Map<number, Sanction>();
+    for (const sanction of sanctions) {
+      const caseNumber = sanction.numeroDossier;
+      if (!uniqueSanctionsByCaseNumber.has(caseNumber)) {
+        uniqueSanctionsByCaseNumber.set(caseNumber, sanction);
+      } else {
+        const sanctionToKeep = sanction.sommeTotale ? sanction : uniqueSanctionsByCaseNumber.get(caseNumber)!
+        uniqueSanctionsByCaseNumber.set(caseNumber, sanctionToKeep);
+      }
+    }
+    return uniqueSanctionsByCaseNumber.values();
   }
 
   onLaunchTreatmentClick() {
