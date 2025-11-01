@@ -48,7 +48,7 @@ export class NextWeekendSuspensionsComponent {
         });
       });
     });
-    const sortedTeams = Array.from(allTeams).sort((a, b) => this.sortTeams(a, b));
+    const sortedTeams = Array.from(allTeams).sort((a, b) => this.sortTeams(a, b, 'desc', 'asc'));
 
     const rows: Record<string, string | CellObject>[] = [];
     this.suspendedPlayersByCategory().forEach(categorySuspendedPlayers => {
@@ -73,20 +73,16 @@ export class NextWeekendSuspensionsComponent {
     return rows;
   });
 
-  sortTeams(a: string, b: string, categoryOrder: 'asc' | 'desc' = 'asc'): number {
+  sortTeams(a: string, b: string, categoryOrder: 'asc' | 'desc', teamOrder: 'asc' | 'desc'): number {
     const uRegex = /^U(\d+)/i;
     const aMatch = a.match(uRegex);
     const bMatch = b.match(uRegex);
-
-    if (aMatch && bMatch) {
-      const aNum = parseInt(aMatch[1], 10);
-      const bNum = parseInt(bMatch[1], 10);
-      if (aNum !== bNum) {
-        return bNum - aNum;
-      }
-      return a.localeCompare(b);
+    const aNum = aMatch ? parseInt(aMatch[1], 10) : 20;
+    const bNum = bMatch ? parseInt(bMatch[1], 10) : 20;;
+    if (aNum !== bNum) {
+      return categoryOrder === 'asc' ? aNum - bNum : bNum - aNum;
     }
-    return categoryOrder === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
+    return teamOrder === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
   }
 
   pdfOptions!: PdfOptions;
@@ -168,7 +164,7 @@ export class NextWeekendSuspensionsComponent {
         }
       }
     });
-    return teamSuspensions.sort((a, b) => this.sortTeams(a.name, b.name, 'desc'));
+    return teamSuspensions.sort((a, b) => this.sortTeams(a.name, b.name, 'asc', 'asc'));
   }
 
   isMatchCountable(match: Match, sanctionStartDate: Date, today: Date) {
