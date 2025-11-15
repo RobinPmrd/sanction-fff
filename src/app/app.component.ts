@@ -37,7 +37,7 @@ export class AppComponent {
 
   requiredColumns = {
     sanction: ['Nom, prénom personne', 'Numéro personne', 'Compétition', 'Date d\'effet', 'Libellé décision', 'Libellé sous catégorie', 'Numéro dossier'],
-    match: ['Compétition', 'Catégorie équipe locale', 'Equipe locale', 'Date du match', 'Date report'],
+    match: ['Compétition', 'Catégorie équipe locale', 'Equipe locale', 'Date du match'],
     teamNameMatching: ['Catégorie Footclub', 'Nom équipe Footclub', 'Nom équipe interne']
   }
 

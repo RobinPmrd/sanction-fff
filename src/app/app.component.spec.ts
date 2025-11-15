@@ -54,36 +54,31 @@ export const seniorTeam1Match: Match = {
   competition: "Régional 1 Intersport",
   categorieEquipeLocale: "Libre / Senior",
   equipeLocale: "TEAM 1",
-  dateDuMatch: new Date(),
-  dateReport: null
+  dateDuMatch: new Date()
 };
 export const seniorTeam2Match: Match = {
   competition: "Régional 3",
   categorieEquipeLocale: "Libre / Senior",
   equipeLocale: "TEAM 2",
-  dateDuMatch: new Date(),
-  dateReport: null
+  dateDuMatch: new Date()
 };
 export const u18Team1Match: Match = {
   competition: "Départemental 1 U18 Masculin",
   categorieEquipeLocale: "Libre / U19 - U18",
   equipeLocale: "TEAM 21",
-  dateDuMatch: new Date(),
-  dateReport: null
+  dateDuMatch: new Date()
 };
 export const loisirTeam1Match: Match = {
   competition: "Départemental Loisirs",
   categorieEquipeLocale: "Foot Loisir / Foot Loisir",
   equipeLocale: "TEAM 1",
-  dateDuMatch: new Date(),
-  dateReport: null
+  dateDuMatch: new Date()
 };
 export const enterpriseTeam1Match: Match = {
   competition: "Départemental 1 Entreprise",
   categorieEquipeLocale: "Foot Entreprise / Senior",
   equipeLocale: "TEAM 1",
-  dateDuMatch: new Date(),
-  dateReport: null
+  dateDuMatch: new Date()
 }
 
 export const seniorPlayer: Sanction = {

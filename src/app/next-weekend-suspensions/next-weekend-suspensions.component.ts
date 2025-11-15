@@ -78,7 +78,7 @@ export class NextWeekendSuspensionsComponent {
     const aMatch = a.match(uRegex);
     const bMatch = b.match(uRegex);
     const aNum = aMatch ? parseInt(aMatch[1], 10) : 20;
-    const bNum = bMatch ? parseInt(bMatch[1], 10) : 20;;
+    const bNum = bMatch ? parseInt(bMatch[1], 10) : 20;
     if (aNum !== bNum) {
       return categoryOrder === 'asc' ? aNum - bNum : bNum - aNum;
     }
@@ -110,7 +110,7 @@ export class NextWeekendSuspensionsComponent {
 
   sanctionAnalysis() {
     this.hasProcess.set(true);
-    const today = new Date()
+    const today = new Date();
     today.setHours(0, 0, 0, 0);
     const suspendedPlayersByCategory = new Map<string, Map<number, PlayerSuspensions>>();
     this.sanctionsPerPlayer().forEach((sanction, player) => {
@@ -145,7 +145,7 @@ export class NextWeekendSuspensionsComponent {
     startDate.setHours(0, 0, 0, 0);
     playerTeams.forEach(team => {
       const teamMatches = this.matchesPerTeam().get(team) ?? [];
-      const nextMatchDate = teamMatches.map(match => match.dateReport ?? match.dateDuMatch).find(matchDate => matchDate > today);
+      const nextMatchDate = teamMatches.map(match => match.dateDuMatch).find(matchDate => matchDate >= today);
       if (nextMatchDate && startDate > nextMatchDate) {
         return;
       }
@@ -168,8 +168,7 @@ export class NextWeekendSuspensionsComponent {
   }
 
   isMatchCountable(match: Match, sanctionStartDate: Date, today: Date) {
-    const matchDate = match.dateReport ?? match.dateDuMatch;
-    return matchDate >= sanctionStartDate && matchDate < today && !match.competition.includes("Amicaux");
+    return match.dateDuMatch >= sanctionStartDate && match.dateDuMatch < today && !match.competition.includes("Amicaux");
   }
 
   extractSuspensionMatches(sanction: Sanction): number | string {

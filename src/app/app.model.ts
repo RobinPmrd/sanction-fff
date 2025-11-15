@@ -20,7 +20,6 @@ export interface Match {
   categorieEquipeLocale: string,
   equipeLocale: string,
   dateDuMatch: Date,
-  dateReport: Date | null
 }
 
 export interface PlayerSuspensions {
