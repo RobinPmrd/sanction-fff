@@ -32,8 +32,9 @@ export class AppComponent {
     const uniqueSanctionsByCaseNumber = this.removeDuplicateCaseNumber(this.sanctions());
     return Map.groupBy(uniqueSanctionsByCaseNumber, sanction => sanction.numeroPersonne)
   });
+  filteredMatches = computed(() => this.matches().filter(match => match.dateDuMatch !== null));
   hasErrors = computed(() => this.sanctionsFileHasErrors() || this.matchesFileHasErrors() || this.errors().length !== 0);
-  disableButton = computed(() => this.sanctions().length === 0 || this.matches().length === 0 || this.hasErrors());
+  disableButton = computed(() => this.sanctions().length === 0 || this.filteredMatches().length === 0 || this.hasErrors());
 
   requiredColumns = {
     sanction: ['Nom, prénom personne', 'Numéro personne', 'Compétition', 'Date d\'effet', 'Libellé décision', 'Libellé sous catégorie', 'Numéro dossier'],
@@ -43,7 +44,7 @@ export class AppComponent {
 
   constructor() {
     effect(() => {
-      if (this.matches().length !== 0 && this.sanctions().length !== 0) {
+      if (this.filteredMatches().length !== 0 && this.sanctions().length !== 0) {
         if (!this.checkSeasonMatching()) {
           this.errors.set(["Le fichier sanctions et rencontres ne datent pas de la même saison"]);
           this.launchTreatment.set(false);
@@ -77,7 +78,7 @@ export class AppComponent {
       this.sanctions().map(s => this.getSeason(s.dateDeffet ?? new Date()))
     );
     const matchSeasons = new Set(
-      this.matches().map(m => this.getSeason(m.dateDuMatch))
+      this.filteredMatches().map(m => this.getSeason(m.dateDuMatch))
     );
     for (const season of sanctionSeasons) {
       if (!matchSeasons.has(season)) {
