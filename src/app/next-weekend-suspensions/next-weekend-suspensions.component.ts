@@ -180,7 +180,11 @@ export class NextWeekendSuspensionsComponent {
     if (sanction.cartonRouge === 'Oui' && cleanText.includes('traite')) {
       return decision;
     }
-    const match = cleanText.match(/(\d+)\s+matchs?\s+de\s+suspension/i);
+    let match = cleanText.match(/(\d+)\s+matchs\s+suspens/i)
+    if (match) {
+      return parseInt(match[1], 10);
+    }
+    match = cleanText.match(/(\d+)\s+matchs?\s+de\s+suspension/i) || cleanText.match(/(\d+)\s+matchs\s+suspens/i);
     let count: number = 0;
     if (match) {
       count += parseInt(match[1], 10);
