@@ -146,7 +146,7 @@ export class NextWeekendSuspensionsComponent {
     playerTeams.forEach(team => {
       const teamMatches = this.matchesPerTeam().get(team) ?? [];
       const nextMatchDate = teamMatches.map(match => match.dateDuMatch).find(matchDate => matchDate >= today);
-      if (nextMatchDate && startDate > nextMatchDate) {
+      if (!nextMatchDate || startDate > nextMatchDate) {
         return;
       }
       if (typeof matchesSuspensionNb === 'string') {

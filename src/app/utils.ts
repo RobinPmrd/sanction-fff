@@ -4,7 +4,7 @@ import { autoTable, CellHook, MarginPaddingInput, Styles } from 'jspdf-autotable
 import { ComponentRef, ElementRef, QueryList } from '@angular/core';
 import { CellObject, CellStyle, utils, WorkBook, WorkSheet, writeFile } from 'xlsx-js-style';
 
-export function parseValue(value: any): Date | null {
+export function parseValue(value: any) {
   if (value === '') {
     return null;
   }
@@ -12,6 +12,8 @@ export function parseValue(value: any): Date | null {
     const stringToMoment = moment(value, 'DD/MM/YYYY', true);
     if (stringToMoment.isValid()) {
       return stringToMoment.toDate()
+    } else {
+      return value.trim();
     }
   }
   return value;
