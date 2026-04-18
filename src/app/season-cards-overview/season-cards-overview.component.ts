@@ -172,10 +172,10 @@ export class SeasonCardsOverviewComponent {
   }
 
   sortRaw(a: CardHistoric, b: CardHistoric) {
-    if (a.subcategory === ' / ') {
+    if (a.subcategory === '/') {
       return 1;
     }
-    if (b.subcategory === ' / ') {
+    if (b.subcategory === '/') {
       return -1;
     }
     for (let index = 0; index < this.currentSorting().length; index++) {
