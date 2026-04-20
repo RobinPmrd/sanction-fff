@@ -26,11 +26,8 @@ export class NextWeekendSuspensionsComponent {
 
   hasProcess = signal(false);
 
-  matchesPerTeam = computed(() =>
-    Map.groupBy(this.matches().sort((a, b) => a.dateDuMatch.getTime() - b.dateDuMatch.getTime()), match => {
-      const teamKey = this.getTeamKey(match);
-      return this.teamNameMatchingPerTeam().get(teamKey) ?? teamKey;
-    })
+  matchesPerTeamName = computed(() =>
+    Map.groupBy(this.matches().sort((a, b) => a.dateDuMatch.getTime() - b.dateDuMatch.getTime()), match => this.getTeamName(match))
   );
   teamNameMatchingPerTeam = computed(() =>
     new Map(this.teamNameMatchings().map(teamNameMatching => [this.getTeamKey(teamNameMatching), teamNameMatching.nomEquipeInterne]))
@@ -144,21 +141,21 @@ export class NextWeekendSuspensionsComponent {
     const startDate = sanctionStartDate ?? today;
     startDate.setHours(0, 0, 0, 0);
     playerTeams.forEach(team => {
-      const teamMatches = this.matchesPerTeam().get(team) ?? [];
+      const teamMatches = this.matchesPerTeamName().get(team) ?? [];
       const nextMatchDate = teamMatches.map(match => match.dateDuMatch).find(matchDate => matchDate >= today);
       if (!nextMatchDate || startDate > nextMatchDate) {
         return;
       }
       if (typeof matchesSuspensionNb === 'string') {
         teamSuspensions.push({
-          name: team.split('Libre')[0],
+          name: team,
           remaining: 999
         });
       } else {
         const matchesPlayedSinceLastSuspension = teamMatches.filter(match => this.isMatchCountable(match, startDate, today)).length;
         if (matchesPlayedSinceLastSuspension < matchesSuspensionNb) {
           teamSuspensions.push({
-            name: team.split('Libre')[0].split('Foot Entreprise')[0],
+            name: team,
             remaining: matchesSuspensionNb - matchesPlayedSinceLastSuspension
           });
         }
@@ -216,8 +213,7 @@ export class NextWeekendSuspensionsComponent {
   getPlayerTeams(subcategory: string) {
     const playerTeams: string[] = [];
     this.matches().forEach(match => {
-      const teamKey = this.getTeamKey(match);
-      const teamName = this.teamNameMatchingPerTeam().get(teamKey) ?? teamKey;
+      const teamName = this.getTeamName(match);
       if (!playerTeams.includes(teamName) && this.isPlayerTeam(subcategory, match)) {
         playerTeams.push(teamName);
       }
@@ -241,5 +237,45 @@ export class NextWeekendSuspensionsComponent {
       return subcategoryNumber <= competitionSubcategoryNumber && competitionSubcategoryNumber - subcategoryNumber <= 2;
     }
     return !subcategoryNumberMatch;
+  }
+
+  getTeamName(match: Match) {
+    const teamKey = this.getTeamKey(match);
+    return this.teamNameMatchingPerTeam().get(teamKey) ?? this.computeTeamName(match.equipeLocale, match.categorieEquipeLocale);
+  }
+
+  numberToLetter(n: number): string {
+    return String.fromCharCode(64 + n);
+  }
+
+  resolveCategoryName(categorie: string): string {
+    const lower = categorie.toLowerCase();
+    if (lower.includes("entreprise")) return "Entreprise";
+    if (lower.includes("loisir")) return "Loisir";
+    return "Sénior";
+  }
+
+  computeTeamName(team: string, category: string): string {
+    const teamNumberStr = team.match(/\d+/)?.[0] || "";
+    if (!teamNumberStr) return team + category;
+    const categories = category.match(/U\d+/g);
+    // CAS Uxx
+    if (categories && categories.length > 0) {
+      if (teamNumberStr.length === 1) {
+        const level = parseInt(teamNumberStr, 10);
+        return `${categories[0]} ${this.numberToLetter(level)}`;
+      }
+      if (teamNumberStr.length === 2) {
+        const categoryIndex = parseInt(teamNumberStr[0], 10) - 1 // 0 or 1;
+        const level = parseInt(teamNumberStr[1], 10);
+        const selectedCategory = categories[categoryIndex];
+        if (!selectedCategory) return "";
+        return `${selectedCategory} ${this.numberToLetter(level)}`;
+      }
+    }
+    // CAS TEXTE (Senior / Loisir / Entreprise)
+    const label = this.resolveCategoryName(category);
+    const level = parseInt(teamNumberStr, 10);
+    return `${label} ${this.numberToLetter(level)}`;
   }
 }
