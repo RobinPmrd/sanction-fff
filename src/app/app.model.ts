@@ -19,6 +19,7 @@ export interface Match {
   competition: string
   categorieEquipeLocale: string,
   equipeLocale: string,
+  equipeAdverse: string,
   dateDuMatch: Date,
 }
 

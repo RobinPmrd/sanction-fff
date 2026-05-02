@@ -48,38 +48,66 @@ describe('AppComponent', () => {
     const expectedSanctionKept = appComponent.sanctions()[0];
     expect(seniorPlayerSuspensions![0]).toEqual(expectedSanctionKept);
   });
+
+  it('should filter matches without opponent team', () => {
+    appComponent.matches.set([
+      { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-07") },
+      { ...seniorTeam1ExemptMatch, dateDuMatch: new Date("2024-09-14") },
+      { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-21") },
+    ]);
+
+    fixture.detectChanges();
+
+    // THEN
+    const filteredMatches = appComponent.filteredMatches();
+    expect(filteredMatches.length).toEqual(2);
+    expect(filteredMatches[0].dateDuMatch).toEqual(new Date("2024-09-07"));
+    expect(filteredMatches[1].dateDuMatch).toEqual(new Date("2024-09-21"));
+  });
 })
 
 export const seniorTeam1Match: Match = {
   competition: "Régional 1 Intersport",
   categorieEquipeLocale: "Libre / Senior",
   equipeLocale: "TEAM 1",
+  equipeAdverse: "OPPONENT 1",
   dateDuMatch: new Date()
 };
 export const seniorTeam2Match: Match = {
   competition: "Régional 3",
   categorieEquipeLocale: "Libre / Senior",
   equipeLocale: "TEAM 2",
+  equipeAdverse: "OPPONENT 2",
   dateDuMatch: new Date()
 };
 export const u18Team1Match: Match = {
   competition: "Départemental 1 U18 Masculin",
   categorieEquipeLocale: "Libre / U19 - U18",
   equipeLocale: "TEAM 21",
+  equipeAdverse: "OPPONENT 21",
   dateDuMatch: new Date()
 };
 export const loisirTeam1Match: Match = {
   competition: "Départemental Loisirs",
   categorieEquipeLocale: "Foot Loisir / Foot Loisir",
   equipeLocale: "TEAM 1",
+  equipeAdverse: "OPPONENT 1",
   dateDuMatch: new Date()
 };
 export const enterpriseTeam1Match: Match = {
   competition: "Départemental 1 Entreprise",
   categorieEquipeLocale: "Foot Entreprise / Senior",
   equipeLocale: "TEAM 1",
+  equipeAdverse: "OPPONENT 1",
   dateDuMatch: new Date()
 }
+export const seniorTeam1ExemptMatch: Match = {
+  competition: "Régional 1 Intersport",
+  categorieEquipeLocale: "Libre / Senior",
+  equipeLocale: "TEAM 1",
+  equipeAdverse: "",
+  dateDuMatch: new Date()
+};
 
 export const seniorPlayer: Sanction = {
   competition: 'Régional 1 Intersport',

@@ -165,7 +165,7 @@ export class NextWeekendSuspensionsComponent {
   }
 
   isMatchCountable(match: Match, sanctionStartDate: Date, today: Date) {
-    return match.dateDuMatch >= sanctionStartDate && match.dateDuMatch < today && !match.competition.includes("Amicaux");
+    return match.equipeAdverse && match.dateDuMatch >= sanctionStartDate && match.dateDuMatch < today && !match.competition.includes("Amicaux");
   }
 
   extractSuspensionMatches(sanction: Sanction): number | string {

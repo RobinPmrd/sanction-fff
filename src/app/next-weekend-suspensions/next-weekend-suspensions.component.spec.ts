@@ -9,6 +9,7 @@ import {
   loisirPlayer,
   loisirTeam1Match,
   seniorPlayer,
+  seniorTeam1ExemptMatch,
   seniorTeam1Match,
   seniorTeam2Match,
   u18Player,
@@ -393,6 +394,28 @@ describe('sanctionAnalysis() Tests', () => {
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 2, 'Libre / U19 - U18',
       [u18Player.numeroPersonne], u18PlayersSuspensions);
 
+  });
+
+  it('should be suspended when exempt match', () => {
+    setInput<Match[]>(componentRef, 'matches', [
+      { ...seniorTeam1ExemptMatch, dateDuMatch: new Date("2024-09-16") },
+      { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-23") },
+      { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-16") },
+      { ...seniorTeam2Match, dateDuMatch: new Date("2024-09-23") }
+    ])
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-15') }]]
+    ]));
+
+    // WHEN
+    nextWeekendSuspensionsComponent.sanctionAnalysis();
+
+    // THEN
+    const seniorPlayersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 1 }] }
+    ]
+    checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
+      [seniorPlayer.numeroPersonne], seniorPlayersSuspensions);
   });
 });
 
