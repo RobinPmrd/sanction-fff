@@ -75,7 +75,7 @@ export class AppComponent {
 
   checkSeasonMatching() {
     const sanctionSeasons = new Set(
-      this.sanctions().map(s => this.getSeason(s.dateDeffet ?? new Date()))
+      this.sanctions().filter(s => s.dateDeffet).map(s => this.getSeason(s.dateDeffet ?? new Date()))
     );
     const matchSeasons = new Set(
       this.filteredMatches().map(m => this.getSeason(m.dateDuMatch))
