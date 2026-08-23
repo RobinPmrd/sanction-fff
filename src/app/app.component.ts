@@ -5,6 +5,7 @@ import { NextWeekendSuspensionsComponent } from './next-weekend-suspensions/next
 import { YellowCardsOverviewComponent } from './yellow-cards-overview/yellow-cards-overview.component';
 import { NgClass } from '@angular/common';
 import { SeasonCardsOverviewComponent } from './season-cards-overview/season-cards-overview.component';
+import { getSeason } from './utils';
 
 @Component({
   selector: 'app-root',
@@ -75,10 +76,10 @@ export class AppComponent {
 
   checkSeasonMatching() {
     const sanctionSeasons = new Set(
-      this.sanctions().filter(s => s.dateDeffet).map(s => this.getSeason(s.dateDeffet ?? new Date()))
+      this.sanctions().filter(s => s.dateDeffet).map(s => getSeason(s.dateDeffet ?? new Date()))
     );
     const matchSeasons = new Set(
-      this.filteredMatches().map(m => this.getSeason(m.dateDuMatch))
+      this.filteredMatches().map(m => getSeason(m.dateDuMatch))
     );
     for (const season of sanctionSeasons) {
       if (!matchSeasons.has(season)) {
@@ -86,10 +87,5 @@ export class AppComponent {
       }
     }
     return true;
-  }
-
-  getSeason(date: Date) {
-    const month = date.getMonth();
-    return month >= 0 && month <= 6 ? date.getFullYear() : date.getFullYear() + 1;
   }
 }

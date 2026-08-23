@@ -288,6 +288,26 @@ describe('sanctionAnalysis() Tests', () => {
     expect(nextWeekendSuspensionsComponent.suspendedPlayersByCategory().size).toBe(0);
   });
 
+  it('should be suspended for next year when computing after season', () => {
+    setInput<Match[]>(componentRef, 'matches', [
+      { ...seniorTeam1Match, dateDuMatch: new Date("2024-05-12") },
+      { ...seniorTeam2Match, dateDuMatch: new Date("2024-05-12") }
+    ])
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-05-13') }]]
+    ]));
+
+    // WHEN
+    nextWeekendSuspensionsComponent.sanctionAnalysis();
+
+    // THEN
+    const playersSuspensions: PlayerSuspensions[] = [
+      { name: seniorPlayer.nomPrenomPersonne, teams: [{ name: 'Sénior A', remaining: 1 }, { name: 'Sénior B', remaining: 1 }] }
+    ]
+    checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
+      [seniorPlayer.numeroPersonne], playersSuspensions);
+  });
+
   it('should be suspended when Loisir player', () => {
     setInput<Match[]>(componentRef, 'matches', [
       { ...loisirTeam1Match, dateDuMatch: new Date("2024-09-23") }

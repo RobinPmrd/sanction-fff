@@ -103,3 +103,8 @@ export function exportArrayToExcel(data: Record<string, string | CellObject>[], 
 export function setInput<V>(componentRef: ComponentRef<any>, input: string, value: V) {
   componentRef.setInput(input, value);
 }
+
+export function getSeason(date: Date) {
+  const month = date.getMonth();
+  return month >= 0 && month <= 6 ? date.getFullYear() : date.getFullYear() + 1;
+}

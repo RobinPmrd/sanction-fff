@@ -5,6 +5,7 @@ import moment from 'moment/moment';
 import { RemainingMatchesPipe } from '../pipe/remaining-matches.pipe';
 import { ExportButtonComponent } from '../export-button/export-button.component';
 import { CellObject, CellStyle } from 'xlsx-js-style';
+import { getSeason } from '../utils';
 
 @Component({
   selector: 'next-weekend-suspensions',
@@ -143,7 +144,8 @@ export class NextWeekendSuspensionsComponent {
     playerTeams.forEach(team => {
       const teamMatches = this.matchesPerTeamName().get(team) ?? [];
       const nextMatchDate = teamMatches.map(match => match.dateDuMatch).find(matchDate => matchDate >= today);
-      if (!nextMatchDate || startDate > nextMatchDate) {
+      const fromPreviousSeason = getSeason(today) > getSeason(startDate);
+      if ((!nextMatchDate || startDate > nextMatchDate) && !fromPreviousSeason) {
         return;
       }
       if (typeof matchesSuspensionNb === 'string') {
