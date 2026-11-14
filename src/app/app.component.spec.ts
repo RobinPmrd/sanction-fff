@@ -49,11 +49,10 @@ describe('AppComponent', () => {
     expect(seniorPlayerSuspensions![0]).toEqual(expectedSanctionKept);
   });
 
-  it('should filter matches without opponent team', () => {
+  it('should not filter matches without opponent team', () => {
     appComponent.matches.set([
       { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-07") },
       { ...seniorTeam1ExemptMatch, dateDuMatch: new Date("2024-09-14") },
-      { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-21") },
     ]);
 
     fixture.detectChanges();
@@ -62,7 +61,7 @@ describe('AppComponent', () => {
     const filteredMatches = appComponent.filteredMatches();
     expect(filteredMatches.length).toEqual(2);
     expect(filteredMatches[0].dateDuMatch).toEqual(new Date("2024-09-07"));
-    expect(filteredMatches[1].dateDuMatch).toEqual(new Date("2024-09-21"));
+    expect(filteredMatches[1].dateDuMatch).toEqual(new Date("2024-09-14"));
   });
 })
 

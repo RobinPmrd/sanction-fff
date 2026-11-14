@@ -143,9 +143,9 @@ export class NextWeekendSuspensionsComponent {
     startDate.setHours(0, 0, 0, 0);
     playerTeams.forEach(team => {
       const teamMatches = this.matchesPerTeamName().get(team) ?? [];
-      const nextMatchDate = teamMatches.map(match => match.dateDuMatch).find(matchDate => matchDate >= today);
+      const nextMatch = teamMatches.find(match => match.dateDuMatch >= today);
       const fromPreviousSeason = getSeason(today) > getSeason(startDate);
-      if ((!nextMatchDate || startDate > nextMatchDate) && !fromPreviousSeason) {
+      if ((!nextMatch || !nextMatch.equipeAdverse || startDate > nextMatch.dateDuMatch) && !fromPreviousSeason) {
         return;
       }
       if (typeof matchesSuspensionNb === 'string') {

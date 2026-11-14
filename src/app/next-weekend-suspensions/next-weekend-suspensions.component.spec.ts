@@ -437,6 +437,22 @@ describe('sanctionAnalysis() Tests', () => {
     checkSuspendedPlayersByCategory(nextWeekendSuspensionsComponent.suspendedPlayersByCategory(), 1, 'Libre / Senior',
       [seniorPlayer.numeroPersonne], seniorPlayersSuspensions);
   });
+
+  it('should not appear as suspended for the upcoming weekend when exempt match', () => {
+    setInput<Match[]>(componentRef, 'matches', [
+      { ...seniorTeam1ExemptMatch, dateDuMatch: new Date("2024-09-23") },
+      { ...seniorTeam1Match, dateDuMatch: new Date("2024-09-30") }
+    ])
+    setInput<Map<number, Sanction[]>>(componentRef, 'sanctionsPerPlayer', new Map([
+      [seniorPlayer.numeroPersonne, [{ ...seniorPlayer, dateDeffet: new Date('2024-09-18') }]]
+    ]));
+
+    // WHEN
+    nextWeekendSuspensionsComponent.sanctionAnalysis();
+
+    // THEN
+    expect(nextWeekendSuspensionsComponent.suspendedPlayersByCategory().size).toBe(0);
+  });
 });
 
 describe("isPlayerTeam() Tests", () => {

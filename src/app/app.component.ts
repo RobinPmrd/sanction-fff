@@ -33,7 +33,7 @@ export class AppComponent {
     const uniqueSanctionsByCaseNumber = this.removeDuplicateCaseNumber(this.sanctions());
     return Map.groupBy(uniqueSanctionsByCaseNumber, sanction => sanction.numeroPersonne)
   });
-  filteredMatches = computed(() => this.matches().filter(match => match.dateDuMatch && match.equipeAdverse));
+  filteredMatches = computed(() => this.matches().filter(match => match.dateDuMatch));
   hasErrors = computed(() => this.sanctionsFileHasErrors() || this.matchesFileHasErrors() || this.errors().length !== 0);
   disableButton = computed(() => this.sanctions().length === 0 || this.filteredMatches().length === 0 || this.hasErrors());
 
