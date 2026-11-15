@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, input, QueryList, ViewChildren } from '@angular/core';
+import { Component, computed, effect, ElementRef, input, QueryList, ViewChildren } from '@angular/core';
 import { PdfOptions, Sanction } from '../app.model';
 import { DatePipe } from '@angular/common';
 import moment from 'moment';
@@ -24,9 +24,10 @@ export class YellowCardsOverviewComponent {
   @ViewChildren('table') tables!: QueryList<ElementRef<HTMLTableElement>>;
 
   sanctionsPerPlayer = input.required<Map<number, Sanction[]>>();
+  overrideDate = input<Date | null>(null);
   yellowCardsData = computed(() => {
     const yellowCardsData: YellowCardData[] = [];
-    const today = new Date();
+    const today = this.overrideDate() ?? new Date();
     this.sanctionsPerPlayer().forEach((sanctions) => {
       const yellowCardData = this.buildYellowCardData(sanctions, today);
       if (yellowCardData.number > 0) {
@@ -59,11 +60,18 @@ export class YellowCardsOverviewComponent {
     });
   });
 
-  pdfOptions: PdfOptions = {
-    title: `Cartons jaunes actifs au ${moment().format('DD/MM/YYYY')}`,
-    columnStyles: {
-      4: { cellWidth: 37.84 },
-    }
+  pdfOptions!: PdfOptions;
+
+  constructor() {
+    effect(() => {
+      const today = moment(this.overrideDate() ?? new Date());
+      this.pdfOptions = {
+        title: `Cartons jaunes actifs au ${today.format('DD/MM/YYYY')}`,
+        columnStyles: {
+          4: { cellWidth: 37.84 },
+        }
+      };
+    });
   }
 
   buildYellowCardData(sanctions: Sanction[], today: Date): YellowCardData {

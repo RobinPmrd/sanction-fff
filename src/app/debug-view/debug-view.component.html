@@ -1,0 +1,174 @@
+<div class="flex flex-col gap-4 max-h-[calc(100vh-280px)] min-h-[400px] w-full overflow-auto">
+  <!-- Onglets de navigation -->
+  <div class="flex gap-3 flex-shrink-0 justify-center">
+    <button
+      class="bg-blue-600 hover:bg-gray-50 hover:text-blue-600 font-medium px-5 py-2 rounded-lg shadow-md"
+      [ngClass]="{'border border-gray-100 border-b-4 border-b-blue-600 text-blue-600 bg-gray-50': activeSection() === 'sanctions', 'bg-blue-600 text-gray-50': activeSection() !== 'sanctions'}"
+      (click)="switchSection('sanctions')"
+    >
+      Sanctions
+    </button>
+    <button
+      class="bg-blue-600 hover:bg-gray-50 hover:text-blue-600 font-medium px-5 py-2 rounded-lg shadow-md"
+      [ngClass]="{'border border-gray-100 border-b-4 border-b-blue-600 text-blue-600 bg-gray-50': activeSection() === 'matches', 'bg-blue-600 text-gray-50': activeSection() !== 'matches'}"
+      (click)="switchSection('matches')"
+    >
+      Rencontres
+    </button>
+  </div>
+
+  <!-- Section: Sanctions avec filtre -->
+  @if (activeSection() === 'sanctions') {
+    <div class="flex flex-col gap-3">
+      <!-- Filtre de recherche par joueur -->
+      <div class="flex gap-3 items-center flex-shrink-0 justify-center">
+        <input
+          type="text"
+          placeholder="Filtrer par nom ou numéro de joueur..."
+          class="w-[400px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          [value]="sanctionFilter()"
+          (input)="sanctionFilter.set($any($event.target).value)"
+        />
+        @if (sanctionFilter()) {
+          <button
+            class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+            (click)="sanctionFilter.set('')"
+          >
+            ✕ Réinitialiser
+          </button>
+        }
+      </div>
+
+      <!-- Tableau des sanctions -->
+      <div class="max-h-[50vh] overflow-auto border border-solid border-gray-300 rounded-lg">
+        <table class="w-full text-xs border-collapse">
+          <thead class="bg-blue-900 sticky top-0 text-gray-100">
+          <tr>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">#</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Nom, prénom</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Numéro personne</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Compétition</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Date d'effet</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Date de fin</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Décision</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Sous-catégorie</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Cartons jaunes</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Carton rouge</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Somme totale</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Numéro dossier</th>
+            <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Motif</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (sanction of filteredSanctions(); track $index) {
+              <tr class="hover:bg-blue-50 transition-colors even:bg-gray-50">
+                <td class="p-2 border border-gray-200">{{ $index + 1 }}</td>
+                <td class="p-2 border border-gray-200 font-medium">{{ sanction.nomPrenomPersonne }}</td>
+                <td class="p-2 border border-gray-200">{{ sanction.numeroPersonne }}</td>
+                <td class="p-2 border border-gray-200">{{ sanction.competition }}</td>
+                <td class="p-2 border border-gray-200 whitespace-nowrap">{{ sanction.dateDeffet | date:'dd/MM/yyyy' }}</td>
+                <td class="p-2 border border-gray-200 whitespace-nowrap">{{ sanction.dateDeFin | date:'dd/MM/yyyy' }}</td>
+                <td class="p-2 border border-gray-200">{{ sanction.libelleDecision }}</td>
+                <td class="p-2 border border-gray-200">{{ sanction.libelleSousCategorie }}</td>
+                <td class="p-2 border border-gray-200">{{ sanction.nbreCartonsJaunes ?? '-' }}</td>
+                <td class="p-2 border border-gray-200">{{ sanction.cartonRouge }}</td>
+                <td class="p-2 border border-gray-200">{{ sanction.sommeTotale ?? '-' }}</td>
+                <td class="p-2 border border-gray-200">{{ sanction.numeroDossier }}</td>
+                <td class="p-2 border border-gray-200">{{ sanction.libelleMotif ?? '-' }}</td>
+              </tr>
+            }
+            @if (filteredSanctions().length === 0) {
+              <tr>
+                <td colspan="13" class="p-4 text-center text-gray-500 italic">
+                  @if (sanctionFilter()) {
+                    Aucune sanction trouvée pour "{{ sanctionFilter() }}"
+                  } @else {
+                    Aucune sanction
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Section: Rencontres avec filtres -->
+  @if (activeSection() === 'matches') {
+    <div class="flex flex-col gap-3">
+      <!-- Filtres par catégorie et équipe -->
+      <div class="flex gap-3 items-center flex-wrap flex-shrink-0 justify-center">
+        <select
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          [value]="matchCategoryFilter()"
+          (change)="matchCategoryFilter.set($any($event.target).value); onCategoryChange()"
+        >
+          <option value="">Toutes les catégories</option>
+          @for (category of categories(); track category) {
+            <option [value]="category">{{ category }}</option>
+          }
+        </select>
+        <select
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white min-w-[200px]"
+          [value]="matchTeamFilter()"
+          (change)="matchTeamFilter.set($any($event.target).value)"
+        >
+          <option value="">Toutes les équipes</option>
+          @for (team of teamNames(); track team) {
+            <option [value]="team">{{ team }}</option>
+          }
+        </select>
+        @if (matchCategoryFilter() || matchTeamFilter()) {
+          <button
+            class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+            (click)="matchCategoryFilter.set(''); matchTeamFilter.set('')"
+          >
+            ✕ Réinitialiser
+          </button>
+        }
+      </div>
+
+      <!-- Tableau des rencontres -->
+      <div class="max-h-[50vh] overflow-auto flex justify-center">
+        <div class="w-fit overflow-auto border border-solid border-gray-300 rounded-lg">
+          <table class="text-xs border-collapse">
+            <thead class="bg-blue-900 sticky top-0 text-gray-100">
+            <tr>
+              <th class="p-2 text-left border border-gray-600 whitespace-nowrap">#</th>
+              <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Compétition</th>
+              <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Catégorie</th>
+              <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Équipe locale</th>
+              <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Équipe adverse</th>
+              <th class="p-2 text-left border border-gray-600 whitespace-nowrap">Date du match</th>
+            </tr>
+            </thead>
+            <tbody>
+              @for (match of filteredMatches(); track $index) {
+                <tr class="hover:bg-blue-50 transition-colors even:bg-gray-50">
+                  <td class="p-2 border border-gray-200">{{ $index + 1 }}</td>
+                  <td class="p-2 border border-gray-200">{{ match.competition }}</td>
+                  <td class="p-2 border border-gray-200">{{ match.categorieEquipeLocale }}</td>
+                  <td class="p-2 border border-gray-200 font-medium">{{ match.equipeLocale }}</td>
+                  <td class="p-2 border border-gray-200">{{ match.equipeAdverse }}</td>
+                  <td class="p-2 border border-gray-200 whitespace-nowrap">{{ match.dateDuMatch | date:'dd/MM/yyyy' }}</td>
+                </tr>
+              }
+              @if (filteredMatches().length === 0) {
+                <tr>
+                  <td colspan="6" class="p-4 text-center text-gray-500 italic">
+                    @if (matchCategoryFilter() || matchTeamFilter()) {
+                      Aucun match trouvé avec les filtres sélectionnés
+                    } @else {
+                      Aucune rencontre
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+</div>

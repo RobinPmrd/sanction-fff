@@ -3,8 +3,9 @@ import { Match, Sanction, TeamNameMatching } from './app.model';
 import { FileInputComponent } from './file-input/file-input.component';
 import { NextWeekendSuspensionsComponent } from './next-weekend-suspensions/next-weekend-suspensions.component';
 import { YellowCardsOverviewComponent } from './yellow-cards-overview/yellow-cards-overview.component';
-import { NgClass } from '@angular/common';
 import { SeasonCardsOverviewComponent } from './season-cards-overview/season-cards-overview.component';
+import { DebugViewComponent } from './debug-view/debug-view.component';
+import { NgClass } from '@angular/common';
 import { getSeason } from './utils';
 
 @Component({
@@ -13,8 +14,9 @@ import { getSeason } from './utils';
     FileInputComponent,
     NextWeekendSuspensionsComponent,
     YellowCardsOverviewComponent,
-    NgClass,
-    SeasonCardsOverviewComponent
+    SeasonCardsOverviewComponent,
+    DebugViewComponent,
+    NgClass
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -28,6 +30,8 @@ export class AppComponent {
   matchesFileHasErrors = signal(false);
   tab = signal(0);
   errors = signal<string[]>([]);
+  debugMode = signal(false);
+  overrideDate = signal<Date | null>(null);
 
   sanctionsPerPlayer = computed(() => {
     const uniqueSanctionsByCaseNumber = this.removeDuplicateCaseNumber(this.sanctions());
@@ -87,5 +91,13 @@ export class AppComponent {
       }
     }
     return true;
+  }
+
+  onOverrideDateChange(value: string) {
+    this.overrideDate.set(value ? new Date(value) : null);
+  }
+
+  resetOverrideDate() {
+    this.overrideDate.set(null);
   }
 }

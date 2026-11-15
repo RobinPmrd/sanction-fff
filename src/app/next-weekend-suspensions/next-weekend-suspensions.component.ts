@@ -24,6 +24,7 @@ export class NextWeekendSuspensionsComponent {
   matches = input.required<Match[]>();
   teamNameMatchings = input<TeamNameMatching[]>([]);
   process = input(false);
+  overrideDate = input<Date | null>(null);
 
   hasProcess = signal(false);
 
@@ -86,16 +87,18 @@ export class NextWeekendSuspensionsComponent {
   pdfOptions!: PdfOptions;
 
   constructor() {
-    const today = moment();
-    const nextSaturday = today.isoWeekday() <= 6
-      ? today.clone().isoWeekday(6)
-      : today.clone().add(1, 'week').isoWeekday(6);
-    const saturdayDate = nextSaturday.format('DD/MM/YYYY');
-    const nextSunday = nextSaturday.add(1, 'day');
-    const sundayDate = nextSunday.format('DD/MM/YYYY');
-    this.pdfOptions = {
-      title: `Joueurs suspendus – Week-end du ${saturdayDate} au ${sundayDate}`
-    };
+    effect(() => {
+      const today = moment(this.overrideDate() ?? new Date());
+      const nextSaturday = today.isoWeekday() <= 6
+        ? today.clone().isoWeekday(6)
+        : today.clone().add(1, 'week').isoWeekday(6);
+      const saturdayDate = nextSaturday.format('DD/MM/YYYY');
+      const nextSunday = nextSaturday.add(1, 'day');
+      const sundayDate = nextSunday.format('DD/MM/YYYY');
+      this.pdfOptions = {
+        title: `Joueurs suspendus – Week-end du ${saturdayDate} au ${sundayDate}`
+      };
+    });
 
     effect(() => {
       if (this.process()) {
@@ -108,7 +111,7 @@ export class NextWeekendSuspensionsComponent {
 
   sanctionAnalysis() {
     this.hasProcess.set(true);
-    const today = new Date();
+    const today = this.overrideDate() ?? new Date();
     today.setHours(0, 0, 0, 0);
     const suspendedPlayersByCategory = new Map<string, Map<number, PlayerSuspensions>>();
     this.sanctionsPerPlayer().forEach((sanction, player) => {
